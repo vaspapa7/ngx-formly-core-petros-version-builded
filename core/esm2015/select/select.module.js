@@ -1,0 +1,13 @@
+import { __decorate } from "tslib";
+import { NgModule } from '@angular/core';
+import { FormlySelectOptionsPipe } from './select-options.pipe';
+let FormlySelectModule = class FormlySelectModule {
+};
+FormlySelectModule = __decorate([
+    NgModule({
+        declarations: [FormlySelectOptionsPipe],
+        exports: [FormlySelectOptionsPipe],
+    })
+], FormlySelectModule);
+export { FormlySelectModule };
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic2VsZWN0Lm1vZHVsZS5qcyIsInNvdXJjZVJvb3QiOiJuZzovL0BuZ3gtZm9ybWx5L2NvcmUvc2VsZWN0LyIsInNvdXJjZXMiOlsic2VsZWN0Lm1vZHVsZS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiO0FBQUEsT0FBTyxFQUFFLFFBQVEsRUFBRSxNQUFNLGVBQWUsQ0FBQztBQUN6QyxPQUFPLEVBQUUsdUJBQXVCLEVBQUUsTUFBTSx1QkFBdUIsQ0FBQztBQU1oRSxJQUFhLGtCQUFrQixHQUEvQixNQUFhLGtCQUFrQjtDQUFHLENBQUE7QUFBckIsa0JBQWtCO0lBSjlCLFFBQVEsQ0FBQztRQUNSLFlBQVksRUFBRSxDQUFDLHVCQUF1QixDQUFDO1FBQ3ZDLE9BQU8sRUFBRSxDQUFDLHVCQUF1QixDQUFDO0tBQ25DLENBQUM7R0FDVyxrQkFBa0IsQ0FBRztTQUFyQixrQkFBa0IiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBOZ01vZHVsZSB9IGZyb20gJ0Bhbmd1bGFyL2NvcmUnO1xuaW1wb3J0IHsgRm9ybWx5U2VsZWN0T3B0aW9uc1BpcGUgfSBmcm9tICcuL3NlbGVjdC1vcHRpb25zLnBpcGUnO1xuXG5ATmdNb2R1bGUoe1xuICBkZWNsYXJhdGlvbnM6IFtGb3JtbHlTZWxlY3RPcHRpb25zUGlwZV0sXG4gIGV4cG9ydHM6IFtGb3JtbHlTZWxlY3RPcHRpb25zUGlwZV0sXG59KVxuZXhwb3J0IGNsYXNzIEZvcm1seVNlbGVjdE1vZHVsZSB7fVxuIl19
