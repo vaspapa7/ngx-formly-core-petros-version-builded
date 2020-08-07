@@ -1,12 +1,12 @@
 import { OnChanges } from '@angular/core';
 import { FormlyConfig } from '../services/formly.config';
-import { FormlyFieldConfig } from '../models';
+import { FormlyFieldConfig } from '../components/formly.field.config';
 import { Observable } from 'rxjs';
 export declare class FormlyValidationMessage implements OnChanges {
-    private config;
+    private formlyConfig;
     field: FormlyFieldConfig;
     errorMessage$: Observable<string>;
-    constructor(config: FormlyConfig);
+    constructor(formlyConfig: FormlyConfig);
     ngOnChanges(): void;
-    get errorMessage(): string | Observable<string>;
+    readonly errorMessage: string | Observable<string>;
 }

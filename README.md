@@ -11,7 +11,6 @@
   [![Gitter](https://badges.gitter.im/formly-js/ng2-formly.svg)](https://gitter.im/formly-js/ng2-formly)
   [![Build Status](https://api.travis-ci.org/ngx-formly/ngx-formly.svg?branch=master)](https://api.travis-ci.org/ngx-formly/ngx-formly.svg?branch=master)
   [![Twitter](https://img.shields.io/badge/twitter-@formlydev-blue.svg)](https://twitter.com/formlydev)
-  [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/ngx-formly/ngx-formly)
 </div>
 
 ---
@@ -49,8 +48,8 @@ Formly is a dynamic (JSON powered) form library for Angular that bring unmatched
 | [Ionic](https://ionicframework.com)               | [Demo](https://formly.dev/ui/ionic)     | [StackBlitz](https://stackblitz.com/edit/ngx-formly-ui-ionic)     |
 | [PrimeNG](http://primefaces.org/primeng/#/)       | [Demo](https://formly.dev/ui/primeng)   | [StackBlitz](https://stackblitz.com/edit/ngx-formly-ui-primeng)   |
 | [Kendo](http://www.telerik.com/kendo-angular-ui)  | [Demo](https://formly.dev/ui/kendo)     | [StackBlitz](https://stackblitz.com/edit/ngx-formly-ui-kendo)     |
-| [NG-ZORRO](http://ng.ant.design) |     | [StackBlitz](https://stackblitz.com/edit/ngx-formly-ui-ng-zorro-antd)     |
 | [NativeScript](https://www.nativescript.org)      | ||
+| [NG-ZORRO](http://ng.ant.design) |     | [StackBlitz](https://stackblitz.com/edit/ngx-formly-ui-ng-zorro-antd)     |
 
 **Which Version to use?**
 

@@ -1,49 +1,97 @@
-import { __decorate, __param, __metadata, __rest } from 'tslib';
-import { InjectionToken, ɵɵdefineInjectable, Injectable, ComponentFactoryResolver, Injector, Optional, ɵɵinject, INJECTOR, EventEmitter, NgZone, Input, Output, Component, ChangeDetectionStrategy, Renderer2, ElementRef, ViewChild, ViewContainerRef, Inject, Directive, ChangeDetectorRef, NgModule } from '@angular/core';
-import { AbstractControl, FormGroup, FormGroupDirective, FormControl, FormArray, Validators } from '@angular/forms';
-import { isObservable, of, Observable, Subject } from 'rxjs';
-import { filter, switchMap, take, distinctUntilChanged, startWith, debounceTime, map } from 'rxjs/operators';
 import { DOCUMENT, CommonModule } from '@angular/common';
+import { Injectable, InjectionToken, NgModule, ANALYZE_FOR_ENTRY_COMPONENTS, Inject, Optional, Component, Input, ChangeDetectionStrategy, EventEmitter, Output, ViewContainerRef, ViewChild, Attribute, ComponentFactoryResolver, Renderer2, ElementRef, NgZone, Directive, Injector, ChangeDetectorRef, defineInjectable, inject, INJECTOR } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
+import { __rest } from 'tslib';
+import { debounceTime, switchMap, distinctUntilChanged, take, startWith, map } from 'rxjs/operators';
+import { AbstractControl, FormGroup, FormGroupDirective, FormControl, FormArray, Validators } from '@angular/forms';
+import { isObservable, Subject, of, Observable } from 'rxjs';
 
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/**
+ * @param {?} formId
+ * @param {?} field
+ * @param {?} index
+ * @return {?}
+ */
 function getFieldId(formId, field, index) {
-    if (field.id) {
+    if (field.id)
         return field.id;
-    }
+    /** @type {?} */
     let type = field.type;
-    if (!type && field.template) {
+    if (!type && field.template)
         type = 'template';
-    }
     return [formId, type, field.key, index].join('_');
 }
+/**
+ * @param {?} field
+ * @return {?}
+ */
 function getKeyPath(field) {
     if (!field.key) {
         return [];
     }
     /* We store the keyPath in the field for performance reasons. This function will be called frequently. */
     if (!field._keyPath || field._keyPath.key !== field.key) {
-        const key = field.key.indexOf('[') === -1 ? field.key : field.key.replace(/\[(\w+)\]/g, '.$1');
-        defineHiddenProp(field, '_keyPath', { key: field.key, path: key.indexOf('.') !== -1 ? key.split('.') : [key] });
+        /** @type {?} */
+        let path = [];
+        if (typeof field.key === 'string') {
+            /** @type {?} */
+            const key = field.key.indexOf('[') === -1
+                ? field.key
+                : field.key.replace(/\[(\w+)\]/g, '.$1');
+            path = key.indexOf('.') !== -1 ? key.split('.') : [key];
+        }
+        else if (Array.isArray(field.key)) {
+            path = field.key.slice(0);
+        }
+        else {
+            path = [`${field.key}`];
+        }
+        field._keyPath = { key: field.key, path };
     }
     return field._keyPath.path.slice(0);
 }
+/** @type {?} */
 const FORMLY_VALIDATORS = ['required', 'pattern', 'minLength', 'maxLength', 'min', 'max'];
-function assignFieldValue(field, value, autoClear = false) {
+/**
+ * @param {?} field
+ * @param {?} value
+ * @return {?}
+ */
+function assignFieldValue(field, value) {
+    /** @type {?} */
     let paths = getKeyPath(field);
     while (field.parent) {
         field = field.parent;
         paths = [...getKeyPath(field), ...paths];
     }
-    if (autoClear && value === undefined && field['autoClear'] && !field.formControl.parent) {
+    if (value == null && field['autoClear'] && !field.formControl.parent) {
+        /** @type {?} */
         const k = paths.pop();
-        const m = paths.reduce((model, path) => model[path] || {}, field.parent.model);
+        /** @type {?} */
+        const m = paths.reduce((/**
+         * @param {?} model
+         * @param {?} path
+         * @return {?}
+         */
+        (model, path) => model[path] || {}), field.parent.model);
         delete m[k];
         return;
     }
     assignModelValue(field.model, paths, value);
 }
+/**
+ * @param {?} model
+ * @param {?} paths
+ * @param {?} value
+ * @return {?}
+ */
 function assignModelValue(model, paths, value) {
-    for (let i = 0; i < paths.length - 1; i++) {
+    for (let i = 0; i < (paths.length - 1); i++) {
+        /** @type {?} */
         const path = paths[i];
         if (!model[path] || !isObject(model[path])) {
             model[path] = /^\d+$/.test(paths[i + 1]) ? [] : {};
@@ -52,8 +100,14 @@ function assignModelValue(model, paths, value) {
     }
     model[paths[paths.length - 1]] = clone(value);
 }
+/**
+ * @param {?} field
+ * @return {?}
+ */
 function getFieldInitialValue(field) {
+    /** @type {?} */
     let value = field.options['_initialModel'];
+    /** @type {?} */
     let paths = getKeyPath(field);
     while (field.parent) {
         field = field.parent;
@@ -67,8 +121,13 @@ function getFieldInitialValue(field) {
     }
     return value;
 }
+/**
+ * @param {?} field
+ * @return {?}
+ */
 function getFieldValue(field) {
-    let model = field.parent ? field.parent.model : field.model;
+    /** @type {?} */
+    let model = field.parent.model;
     for (const path of getKeyPath(field)) {
         if (!model) {
             return model;
@@ -77,49 +136,89 @@ function getFieldValue(field) {
     }
     return model;
 }
+/**
+ * @param {?} dest
+ * @param {...?} args
+ * @return {?}
+ */
 function reverseDeepMerge(dest, ...args) {
-    args.forEach((src) => {
-        for (const srcArg in src) {
-            if (isNil(dest[srcArg]) || isBlankString(dest[srcArg])) {
+    args.forEach((/**
+     * @param {?} src
+     * @return {?}
+     */
+    src => {
+        for (let srcArg in src) {
+            if (isNullOrUndefined(dest[srcArg]) || isBlankString(dest[srcArg])) {
                 dest[srcArg] = clone(src[srcArg]);
             }
             else if (objAndSameType(dest[srcArg], src[srcArg])) {
                 reverseDeepMerge(dest[srcArg], src[srcArg]);
             }
         }
-    });
+    }));
     return dest;
 }
-// check a value is null or undefined
-function isNil(value) {
-    return value == null;
+/**
+ * @param {?} value
+ * @return {?}
+ */
+function isNullOrUndefined(value) {
+    return value === undefined || value === null;
 }
+/**
+ * @param {?} value
+ * @return {?}
+ */
 function isUndefined(value) {
     return value === undefined;
 }
+/**
+ * @param {?} value
+ * @return {?}
+ */
 function isBlankString(value) {
     return value === '';
 }
+/**
+ * @param {?} value
+ * @return {?}
+ */
 function isFunction(value) {
-    return typeof value === 'function';
+    return typeof (value) === 'function';
 }
+/**
+ * @param {?} obj1
+ * @param {?} obj2
+ * @return {?}
+ */
 function objAndSameType(obj1, obj2) {
-    return (isObject(obj1) &&
-        isObject(obj2) &&
-        Object.getPrototypeOf(obj1) === Object.getPrototypeOf(obj2) &&
-        !(Array.isArray(obj1) || Array.isArray(obj2)));
+    return isObject(obj1) && isObject(obj2)
+        && Object.getPrototypeOf(obj1) === Object.getPrototypeOf(obj2)
+        && !(Array.isArray(obj1) || Array.isArray(obj2));
 }
+/**
+ * @param {?} x
+ * @return {?}
+ */
 function isObject(x) {
     return x != null && typeof x === 'object';
 }
+/**
+ * @param {?} obj
+ * @return {?}
+ */
 function isPromise(obj) {
     return !!obj && typeof obj.then === 'function';
 }
+/**
+ * @param {?} value
+ * @return {?}
+ */
 function clone(value) {
-    if (!isObject(value) ||
-        isObservable(value) ||
-        /* instanceof SafeHtmlImpl */ value.changingThisBreaksApplicationSecurity ||
-        ['RegExp', 'FileList', 'File', 'Blob'].indexOf(value.constructor.name) !== -1) {
+    if (!isObject(value)
+        || isObservable(value)
+        || /* instanceof SafeHtmlImpl */ value.changingThisBreaksApplicationSecurity
+        || ['RegExp', 'FileList', 'File', 'Blob'].indexOf(value.constructor.name) !== -1) {
         return value;
     }
     // https://github.com/moment/moment/blob/master/moment.js#L252
@@ -133,16 +232,28 @@ function clone(value) {
         return new Date(value.getTime());
     }
     if (Array.isArray(value)) {
-        return value.slice(0).map((v) => clone(v));
+        return value.slice(0).map((/**
+         * @param {?} v
+         * @return {?}
+         */
+        v => clone(v)));
     }
     // best way to clone a js object maybe
     // https://stackoverflow.com/questions/41474986/how-to-clone-a-javascript-es6-class-instance
+    /** @type {?} */
     const proto = Object.getPrototypeOf(value);
+    /** @type {?} */
     let c = Object.create(proto);
     c = Object.setPrototypeOf(c, proto);
     // need to make a deep copy so we dont use Object.assign
     // also Object.assign wont copy property descriptor exactly
-    return Object.keys(value).reduce((newVal, prop) => {
+    return Object.keys(value).reduce((/**
+     * @param {?} newVal
+     * @param {?} prop
+     * @return {?}
+     */
+    (newVal, prop) => {
+        /** @type {?} */
         const propDesc = Object.getOwnPropertyDescriptor(value, prop);
         if (propDesc.get) {
             Object.defineProperty(newVal, prop, propDesc);
@@ -151,151 +262,210 @@ function clone(value) {
             newVal[prop] = clone(value[prop]);
         }
         return newVal;
-    }, c);
+    }), c);
 }
+/**
+ * @param {?} field
+ * @param {?} prop
+ * @param {?} defaultValue
+ * @return {?}
+ */
 function defineHiddenProp(field, prop, defaultValue) {
     Object.defineProperty(field, prop, { enumerable: false, writable: true, configurable: true });
     field[prop] = defaultValue;
 }
-function observeDeep({ source, paths, target, setFn }) {
-    const observers = [];
-    if (paths.length === 0) {
-        target = source;
-    }
-    Object.keys(target).forEach((path) => {
-        let unsubscribe = () => { };
-        const observer = observe(source, [...paths, path], ({ firstChange, currentValue }) => {
-            !firstChange && setFn();
-            unsubscribe();
-            const i = observers.indexOf(unsubscribe);
-            if (i > -1) {
-                observers.splice(i, 1);
-            }
-            if (isObject(currentValue) && currentValue.constructor.name === 'Object') {
-                unsubscribe = observeDeep({ source, setFn, paths: [...paths, path], target: currentValue });
-                observers.push(unsubscribe);
-            }
-        });
-        observers.push(() => observer.unsubscribe());
-    });
-    return () => {
-        observers.forEach((observer) => observer());
-    };
-}
-function observe(o, paths, setFn) {
+/**
+ * @template T
+ * @param {?} o
+ * @param {?} prop
+ * @param {?} setFn
+ * @return {?}
+ */
+function wrapProperty(o, prop, setFn) {
     if (!o._observers) {
         defineHiddenProp(o, '_observers', {});
     }
-    let target = o;
-    for (let i = 0; i < paths.length - 1; i++) {
-        if (!target[paths[i]] || !isObject(target[paths[i]])) {
-            target[paths[i]] = /^\d+$/.test(paths[i + 1]) ? [] : {};
-        }
-        target = target[paths[i]];
-    }
-    const key = paths[paths.length - 1];
-    const prop = paths.join('.');
     if (!o._observers[prop]) {
-        o._observers[prop] = { value: target[key], onChange: [] };
+        o._observers[prop] = [];
     }
-    const state = o._observers[prop];
-    if (state.onChange.indexOf(setFn) === -1) {
-        state.onChange.push(setFn);
-        setFn({ currentValue: state.value, firstChange: true });
-        if (state.onChange.length === 1) {
-            const { enumerable } = Object.getOwnPropertyDescriptor(target, key) || { enumerable: true };
-            Object.defineProperty(target, key, {
-                enumerable,
+    /** @type {?} */
+    let fns = o._observers[prop];
+    if (fns.indexOf(setFn) === -1) {
+        fns.push(setFn);
+        setFn({ currentValue: o[prop], firstChange: true });
+        if (fns.length === 1) {
+            defineHiddenProp(o, `___$${prop}`, o[prop]);
+            Object.defineProperty(o, prop, {
                 configurable: true,
-                get: () => state.value,
-                set: (currentValue) => {
-                    if (currentValue !== state.value) {
-                        const previousValue = state.value;
-                        state.value = currentValue;
-                        state.onChange.forEach((changeFn) => changeFn({ previousValue, currentValue, firstChange: false }));
+                get: (/**
+                 * @return {?}
+                 */
+                () => o[`___$${prop}`]),
+                set: (/**
+                 * @param {?} currentValue
+                 * @return {?}
+                 */
+                currentValue => {
+                    if (currentValue !== o[`___$${prop}`]) {
+                        /** @type {?} */
+                        const previousValue = o[`___$${prop}`];
+                        o[`___$${prop}`] = currentValue;
+                        fns.forEach((/**
+                         * @param {?} changeFn
+                         * @return {?}
+                         */
+                        changeFn => changeFn({ previousValue, currentValue, firstChange: false })));
                     }
-                },
+                }),
             });
         }
     }
-    return {
-        setValue(value) {
-            state.value = value;
-        },
-        unsubscribe() {
-            state.onChange = state.onChange.filter((changeFn) => changeFn !== setFn);
-        },
-    };
+    return (/**
+     * @return {?}
+     */
+    () => fns.splice(fns.indexOf(setFn), 1));
 }
+/**
+ * @param {?} form
+ * @param {?} action
+ * @return {?}
+ */
 function reduceFormUpdateValidityCalls(form, action) {
+    /** @type {?} */
     const updateValidity = form._updateTreeValidity.bind(form);
-    let updateValidityArgs = null;
-    form._updateTreeValidity = (...args) => (updateValidityArgs = args);
+    /** @type {?} */
+    let updateValidityArgs = { called: false, emitEvent: false };
+    form._updateTreeValidity = (/**
+     * @param {?=} __0
+     * @return {?}
+     */
+    ({ emitEvent } = { emitEvent: true }) => updateValidityArgs = { called: true, emitEvent: emitEvent || updateValidityArgs.emitEvent });
     action();
-    updateValidityArgs && updateValidity(updateValidityArgs);
+    updateValidityArgs.called && updateValidity({ emitEvent: updateValidityArgs.emitEvent });
     form._updateTreeValidity = updateValidity;
 }
 
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/** @type {?} */
 const FORMLY_CONFIG = new InjectionToken('FORMLY_CONFIG');
 /**
  * Maintains list of formly field directive types. This can be used to register new field templates.
  */
-let FormlyConfig = class FormlyConfig {
+class FormlyConfig {
     constructor() {
         this.types = {};
         this.validators = {};
         this.wrappers = {};
         this.messages = {};
+        this.templateManipulators = {
+            preWrapper: [],
+            postWrapper: [],
+        };
         this.extras = {
             checkExpressionOn: 'changeDetectionCheck',
-            showError(field) {
-                return (field.formControl &&
-                    field.formControl.invalid &&
-                    (field.formControl.touched ||
-                        (field.options.parentForm && field.options.parentForm.submitted) ||
-                        !!(field.field.validation && field.field.validation.show)));
-            },
+            showError: (/**
+             * @param {?} field
+             * @return {?}
+             */
+            function (field) {
+                return field.formControl && field.formControl.invalid && (field.formControl.touched || (field.options.parentForm && field.options.parentForm.submitted) || !!(field.field.validation && field.field.validation.show));
+            }),
         };
         this.extensions = {};
     }
+    /**
+     * @param {?} config
+     * @return {?}
+     */
     addConfig(config) {
         if (config.types) {
-            config.types.forEach((type) => this.setType(type));
+            config.types.forEach((/**
+             * @param {?} type
+             * @return {?}
+             */
+            type => this.setType(type)));
         }
         if (config.validators) {
-            config.validators.forEach((validator) => this.setValidator(validator));
+            config.validators.forEach((/**
+             * @param {?} validator
+             * @return {?}
+             */
+            validator => this.setValidator(validator)));
         }
         if (config.wrappers) {
-            config.wrappers.forEach((wrapper) => this.setWrapper(wrapper));
+            config.wrappers.forEach((/**
+             * @param {?} wrapper
+             * @return {?}
+             */
+            wrapper => this.setWrapper(wrapper)));
+        }
+        if (config.manipulators) {
+            console.warn(`NgxFormly: passing 'manipulators' config is deprecated, use custom extension instead.`);
+            config.manipulators.forEach((/**
+             * @param {?} manipulator
+             * @return {?}
+             */
+            manipulator => this.setManipulator(manipulator)));
         }
         if (config.validationMessages) {
-            config.validationMessages.forEach((validation) => this.addValidatorMessage(validation.name, validation.message));
+            config.validationMessages.forEach((/**
+             * @param {?} validation
+             * @return {?}
+             */
+            validation => this.addValidatorMessage(validation.name, validation.message)));
         }
         if (config.extensions) {
-            config.extensions.forEach((c) => (this.extensions[c.name] = c.extension));
+            config.extensions.forEach((/**
+             * @param {?} c
+             * @return {?}
+             */
+            c => this.extensions[c.name] = c.extension));
         }
         if (config.extras) {
-            this.extras = Object.assign(Object.assign({}, this.extras), config.extras);
+            this.extras = Object.assign({}, this.extras, config.extras);
         }
     }
+    /**
+     * @param {?} options
+     * @return {?}
+     */
     setType(options) {
         if (Array.isArray(options)) {
-            options.forEach((option) => this.setType(option));
+            options.forEach((/**
+             * @param {?} option
+             * @return {?}
+             */
+            (option) => this.setType(option)));
         }
         else {
             if (!this.types[options.name]) {
-                this.types[options.name] = { name: options.name };
+                this.types[options.name] = (/** @type {?} */ ({ name: options.name }));
             }
-            ['component', 'extends', 'defaultOptions'].forEach((prop) => {
+            ['component', 'extends', 'defaultOptions'].forEach((/**
+             * @param {?} prop
+             * @return {?}
+             */
+            prop => {
                 if (options.hasOwnProperty(prop)) {
                     this.types[options.name][prop] = options[prop];
                 }
-            });
+            }));
             if (options.wrappers) {
-                options.wrappers.forEach((wrapper) => this.setTypeWrapper(options.name, wrapper));
+                options.wrappers.forEach((/**
+                 * @param {?} wrapper
+                 * @return {?}
+                 */
+                (wrapper) => this.setTypeWrapper(options.name, wrapper)));
             }
         }
     }
+    /**
+     * @param {?} name
+     * @return {?}
+     */
     getType(name) {
         if (!this.types[name]) {
             throw new Error(`[Formly Error] The type "${name}" could not be found. Please make sure that is registered through the FormlyModule declaration.`);
@@ -303,23 +473,35 @@ let FormlyConfig = class FormlyConfig {
         this.mergeExtendedType(name);
         return this.types[name];
     }
+    /**
+     * @param {?=} field
+     * @return {?}
+     */
     getMergedField(field = {}) {
+        /** @type {?} */
         const type = this.getType(field.type);
         if (type.defaultOptions) {
             reverseDeepMerge(field, type.defaultOptions);
         }
+        /** @type {?} */
         const extendDefaults = type.extends && this.getType(type.extends).defaultOptions;
         if (extendDefaults) {
             reverseDeepMerge(field, extendDefaults);
         }
         if (field && field.optionsTypes) {
-            field.optionsTypes.forEach((option) => {
+            field.optionsTypes.forEach((/**
+             * @param {?} option
+             * @return {?}
+             */
+            option => {
+                /** @type {?} */
                 const defaultOptions = this.getType(option).defaultOptions;
                 if (defaultOptions) {
                     reverseDeepMerge(field, defaultOptions);
                 }
-            });
+            }));
         }
+        /** @type {?} */
         const componentRef = this.resolveFieldTypeRef(field);
         if (componentRef && componentRef.instance && componentRef.instance.defaultOptions) {
             reverseDeepMerge(field, componentRef.instance.defaultOptions);
@@ -328,39 +510,58 @@ let FormlyConfig = class FormlyConfig {
             field.wrappers = [...type.wrappers];
         }
     }
-    /** @internal */
+    /**
+     * \@internal
+     * @param {?=} field
+     * @return {?}
+     */
     resolveFieldTypeRef(field = {}) {
         if (!field.type) {
             return null;
         }
+        /** @type {?} */
         const type = this.getType(field.type);
         if (!type.component || type['_componentRef']) {
             return type['_componentRef'];
         }
-        const { _resolver, _injector } = field.options;
-        if (!_resolver || !_injector) {
-            return null;
-        }
+        const { _resolver, _injector } = field.parent.options;
         defineHiddenProp(type, '_componentRef', _resolver.resolveComponentFactory(type.component).create(_injector));
         return type['_componentRef'];
     }
+    /**
+     * @param {?} options
+     * @return {?}
+     */
     setWrapper(options) {
         this.wrappers[options.name] = options;
         if (options.types) {
-            options.types.forEach((type) => {
+            options.types.forEach((/**
+             * @param {?} type
+             * @return {?}
+             */
+            (type) => {
                 this.setTypeWrapper(type, options.name);
-            });
+            }));
         }
     }
+    /**
+     * @param {?} name
+     * @return {?}
+     */
     getWrapper(name) {
         if (!this.wrappers[name]) {
             throw new Error(`[Formly Error] The wrapper "${name}" could not be found. Please make sure that is registered through the FormlyModule declaration.`);
         }
         return this.wrappers[name];
     }
+    /**
+     * @param {?} type
+     * @param {?} name
+     * @return {?}
+     */
     setTypeWrapper(type, name) {
         if (!this.types[type]) {
-            this.types[type] = {};
+            this.types[type] = (/** @type {?} */ ({}));
         }
         if (!this.types[type].wrappers) {
             this.types[type].wrappers = [];
@@ -369,25 +570,55 @@ let FormlyConfig = class FormlyConfig {
             this.types[type].wrappers.push(name);
         }
     }
+    /**
+     * @param {?} options
+     * @return {?}
+     */
     setValidator(options) {
         this.validators[options.name] = options;
     }
+    /**
+     * @param {?} name
+     * @return {?}
+     */
     getValidator(name) {
         if (!this.validators[name]) {
             throw new Error(`[Formly Error] The validator "${name}" could not be found. Please make sure that is registered through the FormlyModule declaration.`);
         }
         return this.validators[name];
     }
+    /**
+     * @param {?} name
+     * @param {?} message
+     * @return {?}
+     */
     addValidatorMessage(name, message) {
         this.messages[name] = message;
     }
+    /**
+     * @param {?} name
+     * @return {?}
+     */
     getValidatorMessage(name) {
         return this.messages[name];
     }
+    /**
+     * @param {?} manipulator
+     * @return {?}
+     */
+    setManipulator(manipulator) {
+        new manipulator.class()[manipulator.method](this);
+    }
+    /**
+     * @private
+     * @param {?} name
+     * @return {?}
+     */
     mergeExtendedType(name) {
         if (!this.types[name].extends) {
             return;
         }
+        /** @type {?} */
         const extendedType = this.getType(this.types[name].extends);
         if (!this.types[name].component) {
             this.types[name].component = extendedType.component;
@@ -396,233 +627,587 @@ let FormlyConfig = class FormlyConfig {
             this.types[name].wrappers = extendedType.wrappers;
         }
     }
-};
-FormlyConfig.ɵprov = ɵɵdefineInjectable({ factory: function FormlyConfig_Factory() { return new FormlyConfig(); }, token: FormlyConfig, providedIn: "root" });
-FormlyConfig = __decorate([
-    Injectable({ providedIn: 'root' })
-], FormlyConfig);
+}
+FormlyConfig.decorators = [
+    { type: Injectable, args: [{ providedIn: 'root' },] }
+];
+/** @nocollapse */ FormlyConfig.ngInjectableDef = defineInjectable({ factory: function FormlyConfig_Factory() { return new FormlyConfig(); }, token: FormlyConfig, providedIn: "root" });
 
-let FormlyFormBuilder = class FormlyFormBuilder {
-    constructor(config, resolver, injector, parentForm) {
-        this.config = config;
-        this.resolver = resolver;
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class FormlyFormBuilder {
+    /**
+     * @param {?} formlyConfig
+     * @param {?} componentFactoryResolver
+     * @param {?} injector
+     */
+    constructor(formlyConfig, componentFactoryResolver, injector) {
+        this.formlyConfig = formlyConfig;
+        this.componentFactoryResolver = componentFactoryResolver;
         this.injector = injector;
-        this.parentForm = parentForm;
     }
-    buildForm(form, fieldGroup = [], model, options) {
-        this.build({ fieldGroup, model, form, options });
-    }
-    build(field) {
-        if (!this.config.extensions.core) {
+    /**
+     * @param {?} formControl
+     * @param {?=} fieldGroup
+     * @param {?=} model
+     * @param {?=} options
+     * @return {?}
+     */
+    buildForm(formControl, fieldGroup = [], model, options) {
+        if (!this.formlyConfig.extensions.core) {
             throw new Error('NgxFormly: missing `forRoot()` call. use `forRoot()` when registering the `FormlyModule`.');
         }
-        if (!field.parent) {
-            this._setOptions(field);
-            reduceFormUpdateValidityCalls(field.form, () => this._build(field));
-            const options = field.options;
-            options.checkExpressions && options.checkExpressions(field, true);
-            options.detectChanges && options.detectChanges(field);
-        }
-        else {
-            this._build(field);
-        }
+        /** @type {?} */
+        const field = { fieldGroup, model, formControl, options: this._setOptions(options) };
+        reduceFormUpdateValidityCalls(formControl, (/**
+         * @return {?}
+         */
+        () => this._buildForm(field)));
+        field.options._checkField(field, true);
     }
-    _build(field) {
-        if (!field) {
-            return;
-        }
-        this.getExtensions().forEach((extension) => extension.prePopulate && extension.prePopulate(field));
-        this.getExtensions().forEach((extension) => extension.onPopulate && extension.onPopulate(field));
+    /**
+     * @private
+     * @param {?} field
+     * @return {?}
+     */
+    _buildForm(field) {
+        this.getExtensions().forEach((/**
+         * @param {?} extension
+         * @return {?}
+         */
+        extension => extension.prePopulate && extension.prePopulate(field)));
+        this.getExtensions().forEach((/**
+         * @param {?} extension
+         * @return {?}
+         */
+        extension => extension.onPopulate && extension.onPopulate(field)));
         if (field.fieldGroup) {
-            field.fieldGroup.forEach((f) => this._build(f));
+            field.fieldGroup.forEach((/**
+             * @param {?} f
+             * @return {?}
+             */
+            (f) => this._buildForm(f)));
         }
-        this.getExtensions().forEach((extension) => extension.postPopulate && extension.postPopulate(field));
+        this.getExtensions().forEach((/**
+         * @param {?} extension
+         * @return {?}
+         */
+        extension => extension.postPopulate && extension.postPopulate(field)));
     }
+    /**
+     * @private
+     * @return {?}
+     */
     getExtensions() {
-        return Object.keys(this.config.extensions).map((name) => this.config.extensions[name]);
+        return Object.keys(this.formlyConfig.extensions).map((/**
+         * @param {?} name
+         * @return {?}
+         */
+        name => this.formlyConfig.extensions[name]));
     }
-    _setOptions(field) {
-        field.form = field.form || new FormGroup({});
-        field.model = field.model || {};
-        field.options = field.options || {};
-        const options = field.options;
+    /**
+     * @private
+     * @param {?} options
+     * @return {?}
+     */
+    _setOptions(options) {
+        options = options || {};
+        options.formState = options.formState || {};
+        if (!options.showError) {
+            options.showError = this.formlyConfig.extras.showError;
+        }
+        if (!options.fieldChanges) {
+            defineHiddenProp(options, 'fieldChanges', new Subject());
+        }
         if (!options._resolver) {
-            defineHiddenProp(options, '_resolver', this.resolver);
+            defineHiddenProp(options, '_resolver', this.componentFactoryResolver);
         }
         if (!options._injector) {
             defineHiddenProp(options, '_injector', this.injector);
         }
-        if (!options.build) {
-            options._buildForm = () => {
-                console.warn(`Formly: 'options._buildForm' is deprecated since v6.0, use 'options.build' instead.`);
-                this.build(field);
-            };
-            options.build = (f) => this.build(f);
+        if (!options._hiddenFieldsForCheck) {
+            options._hiddenFieldsForCheck = [];
         }
-        if (!options.parentForm && this.parentForm) {
-            defineHiddenProp(options, 'parentForm', this.parentForm);
-            observe(options, ['parentForm', 'submitted'], ({ firstChange }) => {
+        if (!options._markForCheck) {
+            options._markForCheck = (/**
+             * @param {?} field
+             * @return {?}
+             */
+            (field) => {
+                if (field._componentRefs) {
+                    field._componentRefs.forEach((/**
+                     * @param {?} ref
+                     * @return {?}
+                     */
+                    ref => {
+                        // NOTE: we cannot use ref.changeDetectorRef, see https://github.com/ngx-formly/ngx-formly/issues/2191
+                        /** @type {?} */
+                        const changeDetectorRef = ref.injector.get(ChangeDetectorRef);
+                        changeDetectorRef.markForCheck();
+                    }));
+                }
+                if (field.fieldGroup) {
+                    field.fieldGroup.forEach((/**
+                     * @param {?} f
+                     * @return {?}
+                     */
+                    f => options._markForCheck(f)));
+                }
+            });
+        }
+        if (!options._buildField) {
+            options._buildField = (/**
+             * @param {?} field
+             * @return {?}
+             */
+            (field) => {
+                this.buildForm(field.form, field.fieldGroup, field.model, field.options);
+                return field;
+            });
+        }
+        return options;
+    }
+}
+FormlyFormBuilder.decorators = [
+    { type: Injectable, args: [{ providedIn: 'root' },] }
+];
+/** @nocollapse */
+FormlyFormBuilder.ctorParameters = () => [
+    { type: FormlyConfig },
+    { type: ComponentFactoryResolver },
+    { type: Injector }
+];
+/** @nocollapse */ FormlyFormBuilder.ngInjectableDef = defineInjectable({ factory: function FormlyFormBuilder_Factory() { return new FormlyFormBuilder(inject(FormlyConfig), inject(ComponentFactoryResolver), inject(INJECTOR)); }, token: FormlyFormBuilder, providedIn: "root" });
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class FormlyForm {
+    /**
+     * @param {?} formlyBuilder
+     * @param {?} formlyConfig
+     * @param {?} ngZone
+     * @param {?} immutable
+     * @param {?} parentFormGroup
+     */
+    constructor(formlyBuilder, formlyConfig, ngZone, 
+    // tslint:disable-next-line
+    immutable, parentFormGroup) {
+        this.formlyBuilder = formlyBuilder;
+        this.formlyConfig = formlyConfig;
+        this.ngZone = ngZone;
+        this.parentFormGroup = parentFormGroup;
+        this.modelChange = new EventEmitter();
+        this.immutable = false;
+        this._modelChangeValue = {};
+        this.modelChangeSubs = [];
+        this.modelChange$ = new Subject();
+        this.modelChangeSub = this.modelChange$.pipe(switchMap((/**
+         * @return {?}
+         */
+        () => this.ngZone.onStable.asObservable().pipe(take(1))))).subscribe((/**
+         * @return {?}
+         */
+        () => this.ngZone.runGuarded((/**
+         * @return {?}
+         */
+        () => {
+            // runGuarded is used to keep the expression changes in-sync
+            // https://github.com/ngx-formly/ngx-formly/issues/2095
+            this.checkExpressionChange();
+            this.modelChange.emit(this._modelChangeValue = clone(this.model));
+        }))));
+        if (immutable !== null) {
+            console.warn(`NgxFormly: passing 'immutable' attribute to 'formly-form' component is deprecated since v5.5, enable immutable mode through NgModule declaration instead.`);
+        }
+        this.immutable = (immutable !== null) || !!formlyConfig.extras.immutable;
+    }
+    /**
+     * @param {?} model
+     * @return {?}
+     */
+    set model(model) { this._model = this.immutable ? clone(model) : model; }
+    /**
+     * @return {?}
+     */
+    get model() { return this._model || {}; }
+    /**
+     * @param {?} fields
+     * @return {?}
+     */
+    set fields(fields) { this._fields = this.immutable ? clone(fields) : fields; }
+    /**
+     * @return {?}
+     */
+    get fields() { return this._fields || []; }
+    /**
+     * @param {?} options
+     * @return {?}
+     */
+    set options(options) { this._options = this.immutable ? clone(options) : options; }
+    /**
+     * @return {?}
+     */
+    get options() { return this._options; }
+    /**
+     * @param {?} content
+     * @return {?}
+     */
+    set content(content) {
+        if (content && content.nativeElement.nextSibling) {
+            console.warn(`NgxFormly: content projection for 'formly-form' component is deprecated since v5.5, you should avoid passing content inside the 'formly-form' tag.`);
+        }
+    }
+    /**
+     * @return {?}
+     */
+    ngDoCheck() {
+        if (this.formlyConfig.extras.checkExpressionOn === 'changeDetectionCheck') {
+            this.checkExpressionChange();
+        }
+    }
+    /**
+     * @param {?} changes
+     * @return {?}
+     */
+    ngOnChanges(changes) {
+        // https://github.com/ngx-formly/ngx-formly/issues/2294
+        if (changes.model && this.field) {
+            this.field.model = this.model;
+        }
+        if (changes.fields || changes.form || (changes.model && this._modelChangeValue !== changes.model.currentValue)) {
+            this.form = this.form || (new FormGroup({}));
+            this.setOptions();
+            this.options.updateInitialValue();
+            this.clearModelSubscriptions();
+            this.formlyBuilder.buildForm(this.form, this.fields, this.model, this.options);
+            this.trackModelChanges(this.fields);
+        }
+    }
+    /**
+     * @return {?}
+     */
+    ngOnDestroy() {
+        this.modelChangeSub.unsubscribe();
+        this.clearModelSubscriptions();
+    }
+    /**
+     * @param {?} __0
+     * @return {?}
+     */
+    changeModel({ key, value, field }) {
+        assignFieldValue(field, value);
+        this.modelChange$.next();
+    }
+    /**
+     * @return {?}
+     */
+    setOptions() {
+        if (!this.options) {
+            this.options = {};
+        }
+        if (!this.options.resetModel) {
+            this.options.resetModel = (/**
+             * @param {?=} model
+             * @return {?}
+             */
+            (model) => {
+                model = clone(isNullOrUndefined(model) ? ((/** @type {?} */ (this.options)))._initialModel : model);
+                if (this.model) {
+                    Object.keys(this.model).forEach((/**
+                     * @param {?} k
+                     * @return {?}
+                     */
+                    k => delete this.model[k]));
+                    Object.assign(this.model, model || {});
+                }
+                ((/** @type {?} */ (this.options)))._buildForm();
+                // we should call `NgForm::resetForm` to ensure changing `submitted` state after resetting form
+                // but only when the current component is a root one.
+                if (this.options.parentForm && this.options.parentForm.control === this.form) {
+                    this.options.parentForm.resetForm(model);
+                }
+                else {
+                    this.form.reset(model);
+                }
+            });
+        }
+        if (!this.options.parentForm && this.parentFormGroup) {
+            defineHiddenProp(this.options, 'parentForm', this.parentFormGroup);
+            wrapProperty(this.options.parentForm, 'submitted', (/**
+             * @param {?} __0
+             * @return {?}
+             */
+            ({ firstChange }) => {
                 if (!firstChange) {
-                    options.checkExpressions(field);
-                    options.detectChanges(field);
+                    this.checkExpressionChange();
+                    ((/** @type {?} */ (this.options)))._markForCheck({
+                        fieldGroup: this.fields,
+                        model: this.model,
+                        formControl: this.form,
+                        options: this.options,
+                    });
+                }
+            }));
+        }
+        if (!this.options.updateInitialValue) {
+            this.options.updateInitialValue = (/**
+             * @return {?}
+             */
+            () => ((/** @type {?} */ (this.options)))._initialModel = clone(this.model));
+        }
+        if (!((/** @type {?} */ (this.options)))._buildForm) {
+            ((/** @type {?} */ (this.options)))._buildForm = (/**
+             * @param {?=} emitModelChange
+             * @return {?}
+             */
+            (emitModelChange = false) => {
+                this.clearModelSubscriptions();
+                this.formlyBuilder.buildForm(this.form, this.fields, this.model, this.options);
+                this.trackModelChanges(this.fields);
+                if (emitModelChange) {
+                    this.modelChange.emit(this._modelChangeValue = clone(this.model));
                 }
             });
         }
     }
-};
-FormlyFormBuilder.ctorParameters = () => [
-    { type: FormlyConfig },
-    { type: ComponentFactoryResolver },
-    { type: Injector },
-    { type: FormGroupDirective, decorators: [{ type: Optional }] }
-];
-FormlyFormBuilder.ɵprov = ɵɵdefineInjectable({ factory: function FormlyFormBuilder_Factory() { return new FormlyFormBuilder(ɵɵinject(FormlyConfig), ɵɵinject(ComponentFactoryResolver), ɵɵinject(INJECTOR), ɵɵinject(FormGroupDirective, 8)); }, token: FormlyFormBuilder, providedIn: "root" });
-FormlyFormBuilder = __decorate([
-    Injectable({ providedIn: 'root' }),
-    __param(3, Optional()),
-    __metadata("design:paramtypes", [FormlyConfig,
-        ComponentFactoryResolver,
-        Injector,
-        FormGroupDirective])
-], FormlyFormBuilder);
-
-let FormlyForm = class FormlyForm {
-    constructor(builder, config, ngZone) {
-        this.builder = builder;
-        this.config = config;
-        this.ngZone = ngZone;
-        this.modelChange = new EventEmitter();
-        this.field = {};
-        this._modelChangeValue = {};
-        this.valueChangesUnsubscribe = () => { };
-    }
-    set form(form) {
-        this.field.form = form;
-    }
-    get form() {
-        return this.field.form;
-    }
-    set model(model) {
-        this.setField({ model });
-    }
-    get model() {
-        return this.field.model;
-    }
-    set fields(fieldGroup) {
-        this.setField({ fieldGroup });
-    }
-    get fields() {
-        return this.field.fieldGroup;
-    }
-    set options(options) {
-        this.setField({ options });
-    }
-    get options() {
-        return this.field.options;
-    }
-    ngDoCheck() {
-        if (this.config.extras.checkExpressionOn === 'changeDetectionCheck') {
-            this.checkExpressionChange();
-        }
-    }
-    ngOnChanges(changes) {
-        if (changes.fields || changes.form || (changes.model && this._modelChangeValue !== changes.model.currentValue)) {
-            this.valueChangesUnsubscribe();
-            this.builder.build(this.field);
-            this.valueChangesUnsubscribe = this.valueChanges();
-        }
-    }
-    ngOnDestroy() {
-        this.valueChangesUnsubscribe();
-    }
+    /**
+     * @private
+     * @return {?}
+     */
     checkExpressionChange() {
-        this.field.options.checkExpressions(this.field);
+        if (this.options && ((/** @type {?} */ (this.options)))._checkField) {
+            ((/** @type {?} */ (this.options)))._checkField({
+                fieldGroup: this.fields,
+                model: this.model,
+                formControl: this.form,
+                options: this.options,
+            });
+        }
     }
-    valueChanges() {
-        this.valueChangesUnsubscribe();
-        const sub = this.field.options.fieldChanges
-            .pipe(filter(({ type }) => type === 'valueChanges'), switchMap(() => this.ngZone.onStable.asObservable().pipe(take(1))))
-            .subscribe(() => this.ngZone.runGuarded(() => {
-            // runGuarded is used to keep in sync the expression changes
-            // https://github.com/ngx-formly/ngx-formly/issues/2095
-            this.checkExpressionChange();
-            this.modelChange.emit((this._modelChangeValue = clone(this.model)));
+    /**
+     * @private
+     * @param {?} fields
+     * @param {?=} rootKey
+     * @return {?}
+     */
+    trackModelChanges(fields, rootKey = []) {
+        fields.forEach((/**
+         * @param {?} field
+         * @return {?}
+         */
+        field => {
+            if (field.key && !field.fieldGroup) {
+                /** @type {?} */
+                const control = field.formControl;
+                /** @type {?} */
+                let valueChanges = control.valueChanges.pipe(distinctUntilChanged());
+                const { updateOn, debounce } = field.modelOptions;
+                if ((!updateOn || updateOn === 'change') && debounce && debounce.default > 0) {
+                    valueChanges = control.valueChanges.pipe(debounceTime(debounce.default));
+                }
+                this.modelChangeSubs.push(valueChanges.subscribe((/**
+                 * @param {?} value
+                 * @return {?}
+                 */
+                (value) => {
+                    // workaround for https://github.com/angular/angular/issues/13792
+                    if (control instanceof FormControl && control['_fields'] && control['_fields'].length > 1) {
+                        control.patchValue(value, { emitEvent: false, onlySelf: true });
+                    }
+                    if (field.parsers && field.parsers.length > 0) {
+                        field.parsers.forEach((/**
+                         * @param {?} parserFn
+                         * @return {?}
+                         */
+                        parserFn => value = parserFn(value)));
+                    }
+                    this.changeModel({ key: [...rootKey, ...getKeyPath(field)].join('.'), value, field });
+                })));
+                // workaround for v5 (https://github.com/ngx-formly/ngx-formly/issues/2061)
+                /** @type {?} */
+                const observers = control.valueChanges['observers'];
+                if (observers && observers.length > 1) {
+                    observers.unshift(observers.pop());
+                }
+            }
+            if (field.fieldGroup && field.fieldGroup.length > 0) {
+                this.trackModelChanges(field.fieldGroup, field.key ? [...rootKey, ...getKeyPath(field)] : rootKey);
+            }
         }));
-        return () => sub.unsubscribe();
     }
-    setField(field) {
-        this.field = Object.assign(Object.assign({}, this.field), (this.config.extras.immutable ? clone(field) : field));
+    /**
+     * @private
+     * @return {?}
+     */
+    clearModelSubscriptions() {
+        this.modelChangeSubs.forEach((/**
+         * @param {?} sub
+         * @return {?}
+         */
+        sub => sub.unsubscribe()));
+        this.modelChangeSubs = [];
     }
-};
+    /**
+     * @private
+     * @return {?}
+     */
+    get field() {
+        return this.fields && this.fields[0] && this.fields[0].parent;
+    }
+}
+FormlyForm.decorators = [
+    { type: Component, args: [{
+                selector: 'formly-form',
+                template: `
+    <formly-field *ngFor="let field of fields"
+      hide-deprecation
+      [form]="field.form"
+      [options]="field.options"
+      [model]="field.model"
+      [field]="field">
+    </formly-field>
+    <ng-container #content>
+      <ng-content></ng-content>
+    </ng-container>
+  `,
+                providers: [FormlyFormBuilder]
+            }] }
+];
+/** @nocollapse */
 FormlyForm.ctorParameters = () => [
     { type: FormlyFormBuilder },
     { type: FormlyConfig },
-    { type: NgZone }
+    { type: NgZone },
+    { type: undefined, decorators: [{ type: Attribute, args: ['immutable',] }] },
+    { type: FormGroupDirective, decorators: [{ type: Optional }] }
 ];
-__decorate([
-    Input(),
-    __metadata("design:type", Object),
-    __metadata("design:paramtypes", [Object])
-], FormlyForm.prototype, "form", null);
-__decorate([
-    Input(),
-    __metadata("design:type", Object),
-    __metadata("design:paramtypes", [Object])
-], FormlyForm.prototype, "model", null);
-__decorate([
-    Input(),
-    __metadata("design:type", Array),
-    __metadata("design:paramtypes", [Array])
-], FormlyForm.prototype, "fields", null);
-__decorate([
-    Input(),
-    __metadata("design:type", Object),
-    __metadata("design:paramtypes", [Object])
-], FormlyForm.prototype, "options", null);
-__decorate([
-    Output(),
-    __metadata("design:type", Object)
-], FormlyForm.prototype, "modelChange", void 0);
-FormlyForm = __decorate([
-    Component({
-        selector: 'formly-form',
-        template: ` <formly-field *ngFor="let f of fields" [field]="f"></formly-field> `,
-        providers: [FormlyFormBuilder],
-        changeDetection: ChangeDetectionStrategy.OnPush
-    }),
-    __metadata("design:paramtypes", [FormlyFormBuilder, FormlyConfig, NgZone])
-], FormlyForm);
+FormlyForm.propDecorators = {
+    form: [{ type: Input }],
+    model: [{ type: Input }],
+    fields: [{ type: Input }],
+    options: [{ type: Input }],
+    modelChange: [{ type: Output }],
+    content: [{ type: ViewChild, args: ['content',] }]
+};
 
-let FormlyField = class FormlyField {
-    constructor(config, renderer, resolver, elementRef) {
-        this.config = config;
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class FormlyField {
+    /**
+     * @param {?} formlyConfig
+     * @param {?} renderer
+     * @param {?} resolver
+     * @param {?} elementRef
+     * @param {?} hideDeprecation
+     */
+    constructor(formlyConfig, renderer, resolver, elementRef, 
+    // tslint:disable-next-line
+    hideDeprecation) {
+        this.formlyConfig = formlyConfig;
         this.renderer = renderer;
         this.resolver = resolver;
         this.elementRef = elementRef;
+        this.warnDeprecation = false;
+        this.modelChange = new EventEmitter();
         this.hostObservers = [];
         this.componentRefs = [];
         this.hooksObservers = [];
-        this.valueChangesUnsubscribe = () => { };
+        this.warnDeprecation = hideDeprecation === null;
     }
+    /**
+     * @param {?} m
+     * @return {?}
+     */
+    set model(m) {
+        this.warnDeprecation && console.warn(`NgxFormly: passing 'model' input to '${this.constructor.name}' component is not required anymore, you may remove it!`);
+    }
+    /**
+     * @param {?} form
+     * @return {?}
+     */
+    set form(form) {
+        this.warnDeprecation && console.warn(`NgxFormly: passing 'form' input to '${this.constructor.name}' component is not required anymore, you may remove it!`);
+    }
+    /**
+     * @param {?} options
+     * @return {?}
+     */
+    set options(options) {
+        this.warnDeprecation && console.warn(`NgxFormly: passing 'options' input to '${this.constructor.name}' component is not required anymore, you may remove it!`);
+    }
+    /**
+     * @return {?}
+     */
     ngAfterContentInit() {
         this.triggerHook('afterContentInit');
     }
+    /**
+     * @return {?}
+     */
+    ngAfterContentChecked() {
+        this.triggerHook('afterContentChecked');
+    }
+    /**
+     * @return {?}
+     */
     ngAfterViewInit() {
         this.triggerHook('afterViewInit');
     }
+    /**
+     * @return {?}
+     */
+    ngAfterViewChecked() {
+        this.triggerHook('afterViewChecked');
+    }
+    /**
+     * @return {?}
+     */
+    ngDoCheck() {
+        this.triggerHook('doCheck');
+    }
+    /**
+     * @return {?}
+     */
     ngOnInit() {
         this.triggerHook('onInit');
     }
+    /**
+     * @param {?} changes
+     * @return {?}
+     */
     ngOnChanges(changes) {
         this.triggerHook('onChanges', changes);
     }
+    /**
+     * @return {?}
+     */
     ngOnDestroy() {
         this.resetRefs(this.field);
-        this.hostObservers.forEach((hostObserver) => hostObserver.unsubscribe());
-        this.hooksObservers.forEach((unsubscribe) => unsubscribe());
-        this.valueChangesUnsubscribe();
+        this.hostObservers.forEach((/**
+         * @param {?} unsubscribe
+         * @return {?}
+         */
+        unsubscribe => unsubscribe()));
+        this.hooksObservers.forEach((/**
+         * @param {?} unsubscribe
+         * @return {?}
+         */
+        unsubscribe => unsubscribe()));
         this.triggerHook('onDestroy');
     }
+    /**
+     * @private
+     * @param {?} containerRef
+     * @param {?} f
+     * @param {?} wrappers
+     * @return {?}
+     */
     renderField(containerRef, f, wrappers) {
         if (this.containerRef === containerRef) {
             this.resetRefs(this.field);
@@ -630,11 +1215,17 @@ let FormlyField = class FormlyField {
         }
         if (wrappers && wrappers.length > 0) {
             const [wrapper, ...wps] = wrappers;
-            const { component } = this.config.getWrapper(wrapper);
+            const { component } = this.formlyConfig.getWrapper(wrapper);
+            /** @type {?} */
             const ref = containerRef.createComponent(this.resolver.resolveComponentFactory(component));
             this.attachComponentRef(ref, f);
-            observe(ref.instance, ['fieldComponent'], ({ currentValue, previousValue, firstChange }) => {
+            wrapProperty(ref.instance, 'fieldComponent', (/**
+             * @param {?} __0
+             * @return {?}
+             */
+            ({ firstChange, previousValue, currentValue }) => {
                 if (currentValue) {
+                    /** @type {?} */
                     const viewRef = previousValue ? previousValue.detach() : null;
                     if (viewRef && !viewRef.destroyed) {
                         currentValue.insert(viewRef);
@@ -644,26 +1235,38 @@ let FormlyField = class FormlyField {
                     }
                     !firstChange && ref.changeDetectorRef.detectChanges();
                 }
-            });
+            }));
         }
         else if (f && f.type) {
-            const { component } = this.config.getType(f.type);
+            const { component } = this.formlyConfig.getType(f.type);
+            /** @type {?} */
             const ref = containerRef.createComponent(this.resolver.resolveComponentFactory(component));
             this.attachComponentRef(ref, f);
         }
     }
+    /**
+     * @private
+     * @param {?} name
+     * @param {?=} changes
+     * @return {?}
+     */
     triggerHook(name, changes) {
-        if (name === 'onInit' || (name === 'onChanges' && changes.field && !changes.field.firstChange)) {
-            this.valueChangesUnsubscribe = this.fieldChanges(this.field);
-        }
         if (this.field && this.field.hooks && this.field.hooks[name]) {
             if (!changes || changes.field) {
+                /** @type {?} */
                 const r = this.field.hooks[name](this.field);
                 if (isObservable(r) && ['onInit', 'afterContentInit', 'afterViewInit'].indexOf(name) !== -1) {
+                    /** @type {?} */
                     const sub = r.subscribe();
-                    this.hooksObservers.push(() => sub.unsubscribe());
+                    this.hooksObservers.push((/**
+                     * @return {?}
+                     */
+                    () => sub.unsubscribe()));
                 }
             }
+        }
+        if (this.field && this.field.lifecycle && this.field.lifecycle[name]) {
+            this.field.lifecycle[name](this.field.form, this.field, this.field.model, this.field.options);
         }
         if (name === 'onChanges' && changes.field) {
             this.renderHostBinding();
@@ -671,33 +1274,65 @@ let FormlyField = class FormlyField {
             this.renderField(this.containerRef, this.field, this.field ? this.field.wrappers : []);
         }
     }
+    /**
+     * @private
+     * @template T
+     * @param {?} ref
+     * @param {?} field
+     * @return {?}
+     */
     attachComponentRef(ref, field) {
         this.componentRefs.push(ref);
         field._componentRefs.push(ref);
         Object.assign(ref.instance, { field });
     }
+    /**
+     * @private
+     * @return {?}
+     */
     renderHostBinding() {
         if (!this.field) {
             return;
         }
-        this.hostObservers.forEach((hostObserver) => hostObserver.unsubscribe());
+        this.hostObservers.forEach((/**
+         * @param {?} unsubscribe
+         * @return {?}
+         */
+        unsubscribe => unsubscribe()));
         this.hostObservers = [
-            observe(this.field, ['hide'], ({ firstChange, currentValue }) => {
+            wrapProperty(this.field, 'hide', (/**
+             * @param {?} __0
+             * @return {?}
+             */
+            ({ firstChange, currentValue }) => {
                 if (!firstChange || (firstChange && currentValue)) {
                     this.renderer.setStyle(this.elementRef.nativeElement, 'display', currentValue ? 'none' : '');
                 }
-            }),
-            observe(this.field, ['className'], ({ firstChange, currentValue }) => {
+            })),
+            wrapProperty(this.field, 'className', (/**
+             * @param {?} __0
+             * @return {?}
+             */
+            ({ firstChange, currentValue }) => {
                 if (!firstChange || (firstChange && currentValue)) {
                     this.renderer.setAttribute(this.elementRef.nativeElement, 'class', currentValue);
                 }
-            }),
+            })),
         ];
     }
+    /**
+     * @private
+     * @param {?} field
+     * @return {?}
+     */
     resetRefs(field) {
         if (field) {
             if (field._componentRefs) {
-                field._componentRefs = field._componentRefs.filter((ref) => this.componentRefs.indexOf(ref) === -1);
+                field._componentRefs = field._componentRefs.filter((/**
+                 * @param {?} ref
+                 * @return {?}
+                 */
+                ref => this.componentRefs.indexOf(ref) === -1));
             }
             else {
                 defineHiddenProp(this.field, '_componentRefs', []);
@@ -705,87 +1340,52 @@ let FormlyField = class FormlyField {
         }
         this.componentRefs = [];
     }
-    fieldChanges(field) {
-        this.valueChangesUnsubscribe();
-        if (!field) {
-            return () => { };
-        }
-        const subscribes = [
-            observeDeep({
-                source: field,
-                target: field.templateOptions,
-                paths: ['templateOptions'],
-                setFn: () => field.options.detectChanges(field),
-            }),
-            observeDeep({
-                source: field,
-                target: field.options.formState,
-                paths: ['options', 'formState'],
-                setFn: () => field.options.detectChanges(field),
-            }),
-        ];
-        for (const path of [['template'], ['fieldGroupClassName'], ['validation', 'show']]) {
-            const fieldObserver = observe(field, path, ({ firstChange }) => !firstChange && field.options.detectChanges(field));
-            subscribes.push(() => fieldObserver.unsubscribe());
-        }
-        if (field.key && !field.fieldGroup) {
-            const control = field.formControl;
-            let valueChanges = control.valueChanges.pipe(distinctUntilChanged());
-            if (control.value !== getFieldValue(field)) {
-                valueChanges = valueChanges.pipe(startWith(control.value));
-            }
-            const { updateOn, debounce } = field.modelOptions;
-            if ((!updateOn || updateOn === 'change') && debounce && debounce.default > 0) {
-                valueChanges = control.valueChanges.pipe(debounceTime(debounce.default));
-            }
-            const sub = valueChanges.subscribe((value) => {
-                // workaround for https://github.com/angular/angular/issues/13792
-                if (control instanceof FormControl && control['_fields'] && control['_fields'].length > 1) {
-                    control.patchValue(value, { emitEvent: false, onlySelf: true });
-                }
-                if (field.parsers && field.parsers.length > 0) {
-                    field.parsers.forEach((parserFn) => (value = parserFn(value)));
-                }
-                assignFieldValue(field, value, true);
-                field.options.fieldChanges.next({ value, field, type: 'valueChanges' });
-            });
-            subscribes.push(() => sub.unsubscribe());
-        }
-        return () => subscribes.forEach((subscribe) => subscribe());
-    }
-};
+}
+FormlyField.decorators = [
+    { type: Component, args: [{
+                selector: 'formly-field',
+                template: `<ng-template #container></ng-template>`
+            }] }
+];
+/** @nocollapse */
 FormlyField.ctorParameters = () => [
     { type: FormlyConfig },
     { type: Renderer2 },
     { type: ComponentFactoryResolver },
-    { type: ElementRef }
+    { type: ElementRef },
+    { type: undefined, decorators: [{ type: Attribute, args: ['hide-deprecation',] }] }
 ];
-__decorate([
-    Input(),
-    __metadata("design:type", Object)
-], FormlyField.prototype, "field", void 0);
-__decorate([
-    ViewChild('container', { read: ViewContainerRef, static: true }),
-    __metadata("design:type", ViewContainerRef)
-], FormlyField.prototype, "containerRef", void 0);
-FormlyField = __decorate([
-    Component({
-        selector: 'formly-field',
-        template: '<ng-template #container></ng-template>',
-        changeDetection: ChangeDetectionStrategy.OnPush
-    }),
-    __metadata("design:paramtypes", [FormlyConfig,
-        Renderer2,
-        ComponentFactoryResolver,
-        ElementRef])
-], FormlyField);
+FormlyField.propDecorators = {
+    field: [{ type: Input }],
+    model: [{ type: Input }],
+    form: [{ type: Input }],
+    options: [{ type: Input }],
+    modelChange: [{ type: Output }],
+    containerRef: [{ type: ViewChild, args: ['container', (/** @type {?} */ ({ read: ViewContainerRef, static: true })),] }]
+};
 
-let FormlyAttributes = class FormlyAttributes {
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class FormlyAttributes {
+    /**
+     * @param {?} renderer
+     * @param {?} elementRef
+     * @param {?} _document
+     */
     constructor(renderer, elementRef, _document) {
         this.renderer = renderer;
         this.elementRef = elementRef;
         this.uiAttributesCache = {};
-        this.uiAttributes = [...FORMLY_VALIDATORS, 'tabindex', 'placeholder', 'readonly', 'disabled', 'step'];
+        this.uiAttributes = [
+            ...FORMLY_VALIDATORS,
+            'tabindex',
+            'placeholder',
+            'readonly',
+            'disabled',
+            'step',
+        ];
         /**
          * HostBinding doesn't register listeners conditionally which may produce some perf issues.
          *
@@ -793,46 +1393,82 @@ let FormlyAttributes = class FormlyAttributes {
          */
         this.uiEvents = {
             listeners: [],
-            events: ['click', 'keyup', 'keydown', 'keypress', 'change'],
+            events: [
+                'click',
+                'keyup',
+                'keydown',
+                'keypress',
+            ],
         };
         this.document = _document;
     }
-    get to() {
-        return this.field.templateOptions || {};
-    }
-    get fieldAttrElements() {
-        return (this.field && this.field['_elementRefs']) || [];
-    }
+    /**
+     * @return {?}
+     */
+    get to() { return this.field.templateOptions || {}; }
+    /**
+     * @private
+     * @return {?}
+     */
+    get fieldAttrElements() { return (this.field && this.field['_elementRefs']) || []; }
+    /**
+     * @param {?} changes
+     * @return {?}
+     */
     ngOnChanges(changes) {
         if (changes.field) {
             this.field.name && this.setAttribute('name', this.field.name);
-            this.uiEvents.listeners.forEach((listener) => listener());
-            this.uiEvents.events.forEach((eventName) => {
-                let callback = this.to && this.to[eventName];
-                if (eventName === 'change') {
-                    callback = this.onChange.bind(this);
+            this.uiEvents.listeners.forEach((/**
+             * @param {?} listener
+             * @return {?}
+             */
+            listener => listener()));
+            this.uiEvents.events.forEach((/**
+             * @param {?} eventName
+             * @return {?}
+             */
+            eventName => {
+                if (this.to && this.to[eventName]) {
+                    this.uiEvents.listeners.push(this.renderer.listen(this.elementRef.nativeElement, eventName, (/**
+                     * @param {?} e
+                     * @return {?}
+                     */
+                    (e) => this.to[eventName](this.field, e))));
                 }
-                if (callback) {
-                    this.uiEvents.listeners.push(this.renderer.listen(this.elementRef.nativeElement, eventName, (e) => callback(this.field, e)));
-                }
-            });
+            }));
             if (this.to && this.to.attributes) {
-                observe(this.field, ['templateOptions', 'attributes'], ({ currentValue, previousValue }) => {
+                wrapProperty(this.to, 'attributes', (/**
+                 * @param {?} __0
+                 * @return {?}
+                 */
+                ({ currentValue, previousValue }) => {
                     if (previousValue) {
-                        Object.keys(previousValue).forEach((attr) => this.removeAttribute(attr));
+                        Object.keys(previousValue).forEach((/**
+                         * @param {?} attr
+                         * @return {?}
+                         */
+                        attr => this.removeAttribute(attr)));
                     }
                     if (currentValue) {
-                        Object.keys(currentValue).forEach((attr) => this.setAttribute(attr, currentValue[attr]));
+                        Object.keys(currentValue).forEach((/**
+                         * @param {?} attr
+                         * @return {?}
+                         */
+                        attr => this.setAttribute(attr, currentValue[attr])));
                     }
-                });
+                }));
             }
             this.detachElementRef(changes.field.previousValue);
             this.attachElementRef(changes.field.currentValue);
             if (this.fieldAttrElements.length === 1) {
                 !this.id && this.field.id && this.setAttribute('id', this.field.id);
-                this.focusObserver = observe(this.field, ['focus'], ({ currentValue }) => {
+                wrapProperty(this.field, 'focus', (/**
+                 * @param {?} __0
+                 * @return {?}
+                 */
+                ({ currentValue }) => {
                     this.toggleFocus(currentValue);
-                });
+                }));
             }
         }
         if (changes.id) {
@@ -846,9 +1482,15 @@ let FormlyAttributes = class FormlyAttributes {
      *
      * Formly issue: https://github.com/ngx-formly/ngx-formly/issues/1317
      * Material issue: https://github.com/angular/components/issues/14024
+     * @return {?}
      */
     ngDoCheck() {
-        this.uiAttributes.forEach((attr) => {
+        this.uiAttributes.forEach((/**
+         * @param {?} attr
+         * @return {?}
+         */
+        attr => {
+            /** @type {?} */
             const value = this.to[attr];
             if (this.uiAttributesCache[attr] !== value) {
                 this.uiAttributesCache[attr] = value;
@@ -859,20 +1501,37 @@ let FormlyAttributes = class FormlyAttributes {
                     this.removeAttribute(attr);
                 }
             }
-        });
+        }));
     }
+    /**
+     * @return {?}
+     */
     ngOnDestroy() {
-        this.uiEvents.listeners.forEach((listener) => listener());
+        this.uiEvents.listeners.forEach((/**
+         * @param {?} listener
+         * @return {?}
+         */
+        listener => listener()));
         this.detachElementRef(this.field);
-        this.focusObserver && this.focusObserver.unsubscribe();
     }
+    /**
+     * @param {?} value
+     * @return {?}
+     */
     toggleFocus(value) {
+        /** @type {?} */
         const element = this.fieldAttrElements ? this.fieldAttrElements[0] : null;
         if (!element || !element.nativeElement.focus) {
             return;
         }
-        const isFocused = !!this.document.activeElement &&
-            this.fieldAttrElements.some(({ nativeElement }) => this.document.activeElement === nativeElement || nativeElement.contains(this.document.activeElement));
+        /** @type {?} */
+        const isFocused = !!this.document.activeElement
+            && this.fieldAttrElements
+                .some((/**
+             * @param {?} __0
+             * @return {?}
+             */
+            ({ nativeElement }) => this.document.activeElement === nativeElement || nativeElement.contains(this.document.activeElement)));
         if (value && !isFocused) {
             element.nativeElement.focus();
         }
@@ -880,18 +1539,30 @@ let FormlyAttributes = class FormlyAttributes {
             element.nativeElement.blur();
         }
     }
+    /**
+     * @param {?} $event
+     * @return {?}
+     */
     onFocus($event) {
-        this.focusObserver && this.focusObserver.setValue(true);
+        this.field['___$focus'] = true;
         if (this.to.focus) {
             this.to.focus(this.field, $event);
         }
     }
+    /**
+     * @param {?} $event
+     * @return {?}
+     */
     onBlur($event) {
-        this.focusObserver && this.focusObserver.setValue(false);
+        this.field['___$focus'] = false;
         if (this.to.blur) {
             this.to.blur(this.field, $event);
         }
     }
+    /**
+     * @param {?} $event
+     * @return {?}
+     */
     onChange($event) {
         if (this.to.change) {
             this.to.change(this.field, $event);
@@ -900,6 +1571,11 @@ let FormlyAttributes = class FormlyAttributes {
             this.field.formControl.markAsDirty();
         }
     }
+    /**
+     * @private
+     * @param {?} f
+     * @return {?}
+     */
     attachElementRef(f) {
         if (!f) {
             return;
@@ -911,109 +1587,488 @@ let FormlyAttributes = class FormlyAttributes {
             defineHiddenProp(f, '_elementRefs', [this.elementRef]);
         }
     }
+    /**
+     * @private
+     * @param {?} f
+     * @return {?}
+     */
     detachElementRef(f) {
+        /** @type {?} */
         const index = f && f['_elementRefs'] ? this.fieldAttrElements.indexOf(this.elementRef) : -1;
         if (index !== -1) {
             this.field['_elementRefs'].splice(index, 1);
         }
     }
+    /**
+     * @private
+     * @param {?} attr
+     * @param {?} value
+     * @return {?}
+     */
     setAttribute(attr, value) {
         this.renderer.setAttribute(this.elementRef.nativeElement, attr, value);
     }
+    /**
+     * @private
+     * @param {?} attr
+     * @return {?}
+     */
     removeAttribute(attr) {
         this.renderer.removeAttribute(this.elementRef.nativeElement, attr);
     }
-};
+}
+FormlyAttributes.decorators = [
+    { type: Directive, args: [{
+                selector: '[formlyAttributes]',
+                host: {
+                    '(focus)': 'onFocus($event)',
+                    '(blur)': 'onBlur($event)',
+                    '(change)': 'onChange($event)',
+                },
+            },] }
+];
+/** @nocollapse */
 FormlyAttributes.ctorParameters = () => [
     { type: Renderer2 },
     { type: ElementRef },
     { type: undefined, decorators: [{ type: Inject, args: [DOCUMENT,] }] }
 ];
-__decorate([
-    Input('formlyAttributes'),
-    __metadata("design:type", Object)
-], FormlyAttributes.prototype, "field", void 0);
-__decorate([
-    Input(),
-    __metadata("design:type", String)
-], FormlyAttributes.prototype, "id", void 0);
-FormlyAttributes = __decorate([
-    Directive({
-        selector: '[formlyAttributes]',
-        host: {
-            '(focus)': 'onFocus($event)',
-            '(blur)': 'onBlur($event)',
-        },
-    }),
-    __param(2, Inject(DOCUMENT)),
-    __metadata("design:paramtypes", [Renderer2, ElementRef, Object])
-], FormlyAttributes);
-
-let FieldType = class FieldType {
-    get model() {
-        return this.field.model;
-    }
-    get form() {
-        return this.field.form;
-    }
-    get options() {
-        return this.field.options;
-    }
-    get key() {
-        return this.field.key;
-    }
-    get formControl() {
-        return this.field.formControl;
-    }
-    get to() {
-        return this.field.templateOptions || {};
-    }
-    get showError() {
-        return this.options.showError(this);
-    }
-    get id() {
-        return this.field.id;
-    }
-    get formState() {
-        return this.options.formState || {};
-    }
+FormlyAttributes.propDecorators = {
+    field: [{ type: Input, args: ['formlyAttributes',] }],
+    id: [{ type: Input }]
 };
-__decorate([
-    Input(),
-    __metadata("design:type", Object)
-], FieldType.prototype, "field", void 0);
-FieldType = __decorate([
-    Directive()
-], FieldType);
 
-let FormlyGroup = class FormlyGroup extends FieldType {
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/**
+ * @abstract
+ * @template F
+ */
+class FieldType {
+    /**
+     * @return {?}
+     */
+    get model() { return this.field.model; }
+    /**
+     * @param {?} m
+     * @return {?}
+     */
+    set model(m) { console.warn(`NgxFormly: passing 'model' input to '${this.constructor.name}' component is not required anymore, you may remove it!`); }
+    /**
+     * @return {?}
+     */
+    get form() { return (/** @type {?} */ (this.field.parent.formControl)); }
+    /**
+     * @param {?} form
+     * @return {?}
+     */
+    set form(form) { console.warn(`NgxFormly: passing 'form' input to '${this.constructor.name}' component is not required anymore, you may remove it!`); }
+    /**
+     * @return {?}
+     */
+    get options() { return this.field.options; }
+    /**
+     * @param {?} options
+     * @return {?}
+     */
+    set options(options) { console.warn(`NgxFormly: passing 'options' input to '${this.constructor.name}' component is not required anymore, you may remove it!`); }
+    /**
+     * @return {?}
+     */
+    get key() { return this.field.key; }
+    /**
+     * @return {?}
+     */
+    get formControl() { return this.field.formControl; }
+    /**
+     * @return {?}
+     */
+    get to() { return this.field.templateOptions || {}; }
+    /**
+     * @return {?}
+     */
+    get showError() { return this.options.showError(this); }
+    /**
+     * @return {?}
+     */
+    get id() { return this.field.id; }
+    /**
+     * @return {?}
+     */
+    get formState() { return this.options.formState || {}; }
+}
+FieldType.propDecorators = {
+    field: [{ type: Input }],
+    model: [{ type: Input }],
+    form: [{ type: Input }],
+    options: [{ type: Input }]
 };
-FormlyGroup = __decorate([
-    Component({
-        selector: 'formly-group',
-        template: `
+/**
+ * @deprecated use `FieldType` instead
+ * @abstract
+ */
+class Field extends FieldType {
+    constructor() {
+        super();
+        console.warn(`NgxFormly: 'Field' has been renamed to 'FieldType', extend 'FieldType' instead.`);
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/**
+ * @param {?} field
+ * @param {?=} emitEvent
+ * @return {?}
+ */
+function unregisterControl(field, emitEvent = false) {
+    /** @type {?} */
+    const form = (/** @type {?} */ (field.formControl.parent));
+    if (!form) {
+        return;
+    }
+    /** @type {?} */
+    const control = field.formControl;
+    /** @type {?} */
+    const opts = { emitEvent };
+    if (form instanceof FormArray) {
+        /** @type {?} */
+        const key = form.controls.findIndex((/**
+         * @param {?} c
+         * @return {?}
+         */
+        c => c === control));
+        if (key !== -1) {
+            updateControl(form, opts, (/**
+             * @return {?}
+             */
+            () => form.removeAt(key)));
+        }
+    }
+    else if (form instanceof FormGroup) {
+        /** @type {?} */
+        const paths = getKeyPath(field);
+        /** @type {?} */
+        const key = paths[paths.length - 1];
+        if (form.get([key]) === control) {
+            updateControl(form, opts, (/**
+             * @return {?}
+             */
+            () => form.removeControl(key)));
+        }
+    }
+    control.setParent(null);
+    if (field['autoClear']) {
+        if (field.parent.model) {
+            delete field.parent.model[Array.isArray(field.key) ? field.key[0] : field.key];
+        }
+        control.reset({ value: undefined, disabled: control.disabled }, { emitEvent: field.fieldGroup ? false : emitEvent, onlySelf: true });
+    }
+}
+/**
+ * @param {?} field
+ * @return {?}
+ */
+function findControl(field) {
+    if (field.formControl) {
+        return field.formControl;
+    }
+    /** @type {?} */
+    const form = (/** @type {?} */ (field.parent.formControl));
+    return form ? form.get(getKeyPath(field)) : null;
+}
+/**
+ * @param {?} field
+ * @param {?=} control
+ * @param {?=} emitEvent
+ * @return {?}
+ */
+function registerControl(field, control, emitEvent = false) {
+    control = control || field.formControl;
+    if (!control['_fields']) {
+        defineHiddenProp(control, '_fields', []);
+    }
+    if (control['_fields'].indexOf(field) === -1) {
+        control['_fields'].push(field);
+    }
+    if (!field.formControl && control) {
+        defineHiddenProp(field, 'formControl', control);
+        field.templateOptions.disabled = !!field.templateOptions.disabled;
+        wrapProperty(field.templateOptions, 'disabled', (/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ firstChange, currentValue }) => {
+            if (!firstChange) {
+                currentValue ? field.formControl.disable() : field.formControl.enable();
+            }
+        }));
+        if (control.registerOnDisabledChange) {
+            control.registerOnDisabledChange((/**
+             * @param {?} value
+             * @return {?}
+             */
+            (value) => field.templateOptions['___$disabled'] = value));
+        }
+    }
+    /** @type {?} */
+    let parent = (/** @type {?} */ (field.parent.formControl));
+    if (!parent) {
+        return;
+    }
+    /** @type {?} */
+    const paths = getKeyPath(field);
+    if (!parent['_formlyControls']) {
+        defineHiddenProp(parent, '_formlyControls', {});
+    }
+    parent['_formlyControls'][paths.join('.')] = control;
+    for (let i = 0; i < (paths.length - 1); i++) {
+        /** @type {?} */
+        const path = paths[i];
+        if (!parent.get([path])) {
+            registerControl({
+                key: [path],
+                formControl: new FormGroup({}),
+                parent: { formControl: parent },
+            });
+        }
+        parent = (/** @type {?} */ (parent.get([path])));
+    }
+    if (field['autoClear'] && field.parent && !isUndefined(field.defaultValue) && isUndefined(getFieldValue(field))) {
+        assignFieldValue(field, field.defaultValue);
+    }
+    /** @type {?} */
+    const value = getFieldValue(field);
+    if (!(isNullOrUndefined(control.value) && isNullOrUndefined(value))
+        && control.value !== value
+        && control instanceof FormControl) {
+        control.patchValue(value);
+    }
+    /** @type {?} */
+    const key = paths[paths.length - 1];
+    if (!field._hide && parent.get([key]) !== control) {
+        updateControl(parent, { emitEvent }, (/**
+         * @return {?}
+         */
+        () => parent.setControl(key, control)));
+    }
+}
+/**
+ * @param {?} c
+ * @return {?}
+ */
+function updateValidity(c) {
+    /** @type {?} */
+    const status = c.status;
+    c.updateValueAndValidity({ emitEvent: false });
+    if (status !== c.status) {
+        ((/** @type {?} */ (c.statusChanges))).emit(c.status);
+    }
+}
+/**
+ * @param {?} form
+ * @param {?} opts
+ * @param {?} action
+ * @return {?}
+ */
+function updateControl(form, opts, action) {
+    /**
+     *  workaround for https://github.com/angular/angular/issues/27679
+     */
+    if (form instanceof FormGroup && !form['__patchForEachChild']) {
+        defineHiddenProp(form, '__patchForEachChild', true);
+        ((/** @type {?} */ (form)))._forEachChild = (/**
+         * @param {?} cb
+         * @return {?}
+         */
+        (cb) => {
+            Object
+                .keys(form.controls)
+                .forEach((/**
+             * @param {?} k
+             * @return {?}
+             */
+            k => form.controls[k] && cb(form.controls[k], k)));
+        });
+    }
+    /**
+     * workaround for https://github.com/angular/angular/issues/20439
+     * @type {?}
+     */
+    const updateValueAndValidity = form.updateValueAndValidity.bind(form);
+    if (opts.emitEvent === false) {
+        form.updateValueAndValidity = (/**
+         * @param {?} opts
+         * @return {?}
+         */
+        (opts) => {
+            updateValueAndValidity(Object.assign({}, (opts || {}), { emitEvent: false }));
+        });
+    }
+    action();
+    if (opts.emitEvent === false) {
+        form.updateValueAndValidity = updateValueAndValidity;
+    }
+}
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/**
+ * @abstract
+ * @template F
+ */
+class FieldArrayType extends FieldType {
+    /**
+     * @param {?=} builder
+     */
+    constructor(builder) {
+        super();
+        this.defaultOptions = {
+            defaultValue: [],
+        };
+        if (builder instanceof FormlyFormBuilder) {
+            console.warn(`NgxFormly: passing 'FormlyFormBuilder' to '${this.constructor.name}' type is not required anymore, you may remove it!`);
+        }
+    }
+    /**
+     * @param {?} field
+     * @return {?}
+     */
+    onPopulate(field) {
+        if (!field.formControl && field.key) {
+            registerControl(field, new FormArray([], { updateOn: field.modelOptions.updateOn }));
+        }
+        field.fieldGroup = field.fieldGroup || [];
+        /** @type {?} */
+        const length = field.model ? field.model.length : 0;
+        if (field.fieldGroup.length > length) {
+            for (let i = field.fieldGroup.length - 1; i >= length; --i) {
+                unregisterControl(field.fieldGroup[i]);
+                field.fieldGroup.splice(i, 1);
+            }
+        }
+        for (let i = field.fieldGroup.length; i < length; i++) {
+            /** @type {?} */
+            const f = Object.assign({}, clone(field.fieldArray), { key: `${i}` });
+            field.fieldGroup.push(f);
+        }
+    }
+    /**
+     * @param {?=} i
+     * @param {?=} initialModel
+     * @param {?=} __2
+     * @return {?}
+     */
+    add(i, initialModel, { markAsDirty } = { markAsDirty: true }) {
+        i = isNullOrUndefined(i) ? this.field.fieldGroup.length : i;
+        if (!this.model) {
+            assignFieldValue(this.field, []);
+        }
+        this.model.splice(i, 0, initialModel ? clone(initialModel) : undefined);
+        ((/** @type {?} */ (this.options)))._buildForm(true);
+        markAsDirty && this.formControl.markAsDirty();
+    }
+    /**
+     * @param {?} i
+     * @param {?=} __1
+     * @return {?}
+     */
+    remove(i, { markAsDirty } = { markAsDirty: true }) {
+        this.model.splice(i, 1);
+        unregisterControl(this.field.fieldGroup[i], true);
+        this.field.fieldGroup.splice(i, 1);
+        this.field.fieldGroup.forEach((/**
+         * @param {?} f
+         * @param {?} key
+         * @return {?}
+         */
+        (f, key) => f.key = `${key}`));
+        ((/** @type {?} */ (this.options)))._buildForm(true);
+        markAsDirty && this.formControl.markAsDirty();
+    }
+}
+/** @nocollapse */
+FieldArrayType.ctorParameters = () => [
+    { type: FormlyFormBuilder, decorators: [{ type: Inject, args: [FORMLY_CONFIG,] }, { type: Optional }] }
+];
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/**
+ * @abstract
+ * @template F
+ */
+class FieldWrapper extends FieldType {
+}
+FieldWrapper.propDecorators = {
+    fieldComponent: [{ type: ViewChild, args: ['fieldComponent', (/** @type {?} */ ({ read: ViewContainerRef, static: false })),] }]
+};
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class FormlyGroup extends FieldType {
+    constructor() {
+        super(...arguments);
+        this.defaultOptions = {
+            defaultValue: {},
+        };
+    }
+}
+FormlyGroup.decorators = [
+    { type: Component, args: [{
+                selector: 'formly-group',
+                template: `
     <formly-field *ngFor="let f of field.fieldGroup" [field]="f"></formly-field>
     <ng-content></ng-content>
   `,
-        host: {
-            '[class]': 'field.fieldGroupClassName || ""',
-        },
-        changeDetection: ChangeDetectionStrategy.OnPush
-    })
-], FormlyGroup);
+                host: {
+                    '[class]': 'field.fieldGroupClassName || ""',
+                }
+            }] }
+];
 
-let FormlyValidationMessage = class FormlyValidationMessage {
-    constructor(config) {
-        this.config = config;
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class FormlyValidationMessage {
+    /**
+     * @param {?} formlyConfig
+     */
+    constructor(formlyConfig) {
+        this.formlyConfig = formlyConfig;
     }
+    /**
+     * @return {?}
+     */
     ngOnChanges() {
-        this.errorMessage$ = this.field.formControl.statusChanges.pipe(startWith(null), switchMap(() => (isObservable(this.errorMessage) ? this.errorMessage : of(this.errorMessage))));
+        this.errorMessage$ = this.field.formControl.statusChanges.pipe(startWith(null), switchMap((/**
+         * @return {?}
+         */
+        () => isObservable(this.errorMessage)
+            ? this.errorMessage
+            : of(this.errorMessage))));
     }
+    /**
+     * @return {?}
+     */
     get errorMessage() {
+        /** @type {?} */
         const fieldForm = this.field.formControl;
-        for (const error in fieldForm.errors) {
+        for (let error in fieldForm.errors) {
             if (fieldForm.errors.hasOwnProperty(error)) {
-                let message = this.config.getValidatorMessage(error);
+                /** @type {?} */
+                let message = this.formlyConfig.getValidatorMessage(error);
                 if (isObject(fieldForm.errors[error])) {
                     if (fieldForm.errors[error].errorPath) {
                         return;
@@ -1028,9 +2083,7 @@ let FormlyValidationMessage = class FormlyValidationMessage {
                 if (this.field.validators && this.field.validators[error] && this.field.validators[error].message) {
                     message = this.field.validators[error].message;
                 }
-                if (this.field.asyncValidators &&
-                    this.field.asyncValidators[error] &&
-                    this.field.asyncValidators[error].message) {
+                if (this.field.asyncValidators && this.field.asyncValidators[error] && this.field.asyncValidators[error].message) {
                     message = this.field.asyncValidators[error].message;
                 }
                 if (typeof message === 'function') {
@@ -1040,239 +2093,89 @@ let FormlyValidationMessage = class FormlyValidationMessage {
             }
         }
     }
-};
+}
+FormlyValidationMessage.decorators = [
+    { type: Component, args: [{
+                selector: 'formly-validation-message',
+                template: `{{ errorMessage$ | async }}`,
+                changeDetection: ChangeDetectionStrategy.OnPush
+            }] }
+];
+/** @nocollapse */
 FormlyValidationMessage.ctorParameters = () => [
     { type: FormlyConfig }
 ];
-__decorate([
-    Input(),
-    __metadata("design:type", Object)
-], FormlyValidationMessage.prototype, "field", void 0);
-FormlyValidationMessage = __decorate([
-    Component({
-        selector: 'formly-validation-message',
-        template: '{{ errorMessage$ | async }}',
-        changeDetection: ChangeDetectionStrategy.OnPush
-    }),
-    __metadata("design:paramtypes", [FormlyConfig])
-], FormlyValidationMessage);
-
-function unregisterControl(field, emitEvent = false) {
-    const form = field.formControl.parent;
-    if (!form) {
-        return;
-    }
-    const control = field.formControl;
-    const opts = { emitEvent };
-    if (form instanceof FormArray) {
-        const key = form.controls.findIndex((c) => c === control);
-        if (key !== -1) {
-            updateControl(form, opts, () => form.removeAt(key));
-        }
-    }
-    else if (form instanceof FormGroup) {
-        const paths = getKeyPath(field);
-        const key = paths[paths.length - 1];
-        if (form.get([key]) === control) {
-            updateControl(form, opts, () => form.removeControl(key));
-        }
-    }
-    control.setParent(null);
-    if (field['autoClear']) {
-        if (field.parent.model) {
-            delete field.parent.model[field.key];
-        }
-        control.reset({ value: undefined, disabled: control.disabled }, { emitEvent: field.fieldGroup ? false : emitEvent, onlySelf: true });
-    }
-}
-function findControl(field) {
-    if (field.formControl) {
-        return field.formControl;
-    }
-    const form = field.parent.formControl;
-    return form ? form.get(getKeyPath(field)) : null;
-}
-function registerControl(field, control, emitEvent = false) {
-    control = control || field.formControl;
-    if (!control['_fields']) {
-        defineHiddenProp(control, '_fields', []);
-    }
-    if (control['_fields'].indexOf(field) === -1) {
-        control['_fields'].push(field);
-    }
-    if (!field.formControl && control) {
-        defineHiddenProp(field, 'formControl', control);
-        field.templateOptions.disabled = !!field.templateOptions.disabled;
-        const disabledObserver = observe(field, ['templateOptions', 'disabled'], ({ firstChange, currentValue }) => {
-            if (!firstChange) {
-                currentValue ? field.formControl.disable() : field.formControl.enable();
-            }
-        });
-        if (control.registerOnDisabledChange) {
-            control.registerOnDisabledChange(disabledObserver.setValue);
-        }
-    }
-    if (!field.form) {
-        return;
-    }
-    let form = field.form;
-    const paths = getKeyPath(field);
-    if (!form['_formlyControls']) {
-        defineHiddenProp(form, '_formlyControls', {});
-    }
-    form['_formlyControls'][paths.join('.')] = control;
-    for (let i = 0; i < paths.length - 1; i++) {
-        const path = paths[i];
-        if (!form.get([path])) {
-            registerControl({
-                key: path,
-                formControl: new FormGroup({}),
-                form,
-                parent: {},
-            });
-        }
-        form = form.get([path]);
-    }
-    if (field['autoClear'] && !isUndefined(field.defaultValue) && isUndefined(getFieldValue(field))) {
-        assignFieldValue(field, field.defaultValue);
-    }
-    const value = getFieldValue(field);
-    if (!(isNil(control.value) && isNil(value)) && control.value !== value && control instanceof FormControl) {
-        control.patchValue(value, { emitEvent: false });
-    }
-    const key = paths[paths.length - 1];
-    if (!field._hide && form.get([key]) !== control) {
-        updateControl(form, { emitEvent }, () => form.setControl(key, control));
-    }
-}
-function updateValidity(c) {
-    const status = c.status;
-    c.updateValueAndValidity({ emitEvent: false });
-    if (status !== c.status) {
-        c.statusChanges.emit(c.status);
-    }
-}
-function updateControl(form, opts, action) {
-    /**
-     *  workaround for https://github.com/angular/angular/issues/27679
-     */
-    if (form instanceof FormGroup && !form['__patchForEachChild']) {
-        defineHiddenProp(form, '__patchForEachChild', true);
-        form._forEachChild = (cb) => {
-            Object.keys(form.controls).forEach((k) => form.controls[k] && cb(form.controls[k], k));
-        };
-    }
-    /**
-     * workaround for https://github.com/angular/angular/issues/20439
-     */
-    const updateValueAndValidity = form.updateValueAndValidity.bind(form);
-    if (opts.emitEvent === false) {
-        form.updateValueAndValidity = (opts) => {
-            updateValueAndValidity(Object.assign(Object.assign({}, (opts || {})), { emitEvent: false }));
-        };
-    }
-    action();
-    if (opts.emitEvent === false) {
-        form.updateValueAndValidity = updateValueAndValidity;
-    }
-}
-
-let FieldArrayType = class FieldArrayType extends FieldType {
-    onPopulate(field) {
-        if (!field.formControl && field.key) {
-            registerControl(field, new FormArray([], { updateOn: field.modelOptions.updateOn }));
-        }
-        field.fieldGroup = field.fieldGroup || [];
-        const length = field.model ? field.model.length : 0;
-        if (field.fieldGroup.length > length) {
-            for (let i = field.fieldGroup.length - 1; i >= length; --i) {
-                unregisterControl(field.fieldGroup[i]);
-                field.fieldGroup.splice(i, 1);
-            }
-        }
-        for (let i = field.fieldGroup.length; i < length; i++) {
-            const f = Object.assign(Object.assign({}, clone(field.fieldArray)), { key: `${i}` });
-            field.fieldGroup.push(f);
-        }
-    }
-    add(i, initialModel, { markAsDirty } = { markAsDirty: true }) {
-        i = i == null ? this.field.fieldGroup.length : i;
-        if (!this.model) {
-            assignFieldValue(this.field, []);
-        }
-        this.model.splice(i, 0, initialModel ? clone(initialModel) : undefined);
-        this._build();
-        markAsDirty && this.formControl.markAsDirty();
-    }
-    remove(i, { markAsDirty } = { markAsDirty: true }) {
-        this.model.splice(i, 1);
-        unregisterControl(this.field.fieldGroup[i], true);
-        this.field.fieldGroup.splice(i, 1);
-        this.field.fieldGroup.forEach((f, key) => (f.key = `${key}`));
-        this._build();
-        markAsDirty && this.formControl.markAsDirty();
-    }
-    _build() {
-        this.options.build(this.field);
-        this.options.fieldChanges.next({
-            field: this.field,
-            value: getFieldValue(this.field),
-            type: 'valueChanges',
-        });
-    }
+FormlyValidationMessage.propDecorators = {
+    field: [{ type: Input }]
 };
-FieldArrayType = __decorate([
-    Directive()
-], FieldArrayType);
 
-let FieldWrapper = class FieldWrapper extends FieldType {
-};
-__decorate([
-    ViewChild('fieldComponent', { read: ViewContainerRef }),
-    __metadata("design:type", ViewContainerRef)
-], FieldWrapper.prototype, "fieldComponent", void 0);
-FieldWrapper = __decorate([
-    Directive()
-], FieldWrapper);
-
-let FormlyTemplateType = class FormlyTemplateType extends FieldType {
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+class FormlyTemplateType extends FieldType {
+    /**
+     * @param {?} sanitizer
+     */
     constructor(sanitizer) {
         super();
         this.sanitizer = sanitizer;
         this.innerHtml = { content: null, template: null };
     }
+    /**
+     * @return {?}
+     */
     get template() {
-        if (this.field && this.field.template !== this.innerHtml.template) {
+        if (this.field && (this.field.template !== this.innerHtml.template)) {
             this.innerHtml = {
                 template: this.field.template,
-                content: this.to.safeHtml ? this.sanitizer.bypassSecurityTrustHtml(this.field.template) : this.field.template,
+                content: this.to.safeHtml
+                    ? this.sanitizer.bypassSecurityTrustHtml(this.field.template)
+                    : this.field.template,
             };
         }
         return this.innerHtml.content;
     }
-};
+}
+FormlyTemplateType.decorators = [
+    { type: Component, args: [{
+                selector: 'formly-template',
+                template: `<div [innerHtml]="template"></div>`
+            }] }
+];
+/** @nocollapse */
 FormlyTemplateType.ctorParameters = () => [
     { type: DomSanitizer }
 ];
-FormlyTemplateType = __decorate([
-    Component({
-        selector: 'formly-template',
-        template: `<div [innerHtml]="template"></div>`,
-        changeDetection: ChangeDetectionStrategy.OnPush
-    }),
-    __metadata("design:paramtypes", [DomSanitizer])
-], FormlyTemplateType);
 
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/**
+ * @param {?} expression
+ * @param {?} argNames
+ * @return {?}
+ */
 function evalStringExpression(expression, argNames) {
     try {
-        return Function(...argNames, `return ${expression};`);
+        if (expression.indexOf('this.field') !== -1) {
+            console.warn(`NgxFormly: using 'this.field' in expressionProperties is deprecated since v5.1, use 'field' instead.`);
+        }
+        return (/** @type {?} */ (Function(...argNames, `return ${expression};`)));
     }
     catch (error) {
         console.error(error);
     }
 }
+/**
+ * @param {?} expression
+ * @param {?} thisArg
+ * @param {?} argVal
+ * @return {?}
+ */
 function evalExpression(expression, thisArg, argVal) {
-    if (typeof expression === 'function') {
+    if (expression instanceof Function) {
         return expression.apply(thisArg, argVal);
     }
     else {
@@ -1280,136 +2183,346 @@ function evalExpression(expression, thisArg, argVal) {
     }
 }
 
-/** @experimental */
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/**
+ * \@experimental
+ */
 class FieldExpressionExtension {
+    /**
+     * @param {?} field
+     * @return {?}
+     */
+    prePopulate(field) {
+        if (field.parent || field.options._checkField) {
+            return;
+        }
+        /** @type {?} */
+        let checkLocked = false;
+        field.options._checkField = (/**
+         * @param {?} f
+         * @param {?} ignoreCache
+         * @return {?}
+         */
+        (f, ignoreCache) => {
+            if (!checkLocked) {
+                checkLocked = true;
+                reduceFormUpdateValidityCalls(f.formControl, (/**
+                 * @return {?}
+                 */
+                () => this.checkField(f, ignoreCache)));
+                checkLocked = false;
+            }
+        });
+    }
+    /**
+     * @param {?} field
+     * @return {?}
+     */
     onPopulate(field) {
-        if (field._expressions) {
+        if (!field.parent || field._expressionProperties) {
             return;
         }
         // cache built expression
-        defineHiddenProp(field, '_expressions', {});
-        field.expressionProperties = field.expressionProperties || {};
-        observe(field, ['hide'], ({ currentValue, firstChange }) => {
-            defineHiddenProp(field, '_hide', !!currentValue);
-            if (!firstChange || (firstChange && currentValue === true)) {
-                field.templateOptions.hidden = currentValue;
-                field.options._hiddenFieldsForCheck.push(field);
-            }
-        });
-        if (field.hideExpression) {
-            observe(field, ['hideExpression'], ({ currentValue: expr }) => {
-                field._expressions.hide = this.parseExpressions(field, 'hide', typeof expr === 'boolean' ? () => expr : expr);
-            });
-        }
-        for (const key of Object.keys(field.expressionProperties)) {
-            observe(field, ['expressionProperties', key], ({ currentValue: expr }) => {
-                if (typeof expr === 'string' || isFunction(expr)) {
-                    field._expressions[key] = this.parseExpressions(field, key, expr);
+        defineHiddenProp(field, '_expressionProperties', {});
+        if (field.expressionProperties) {
+            for (const key in field.expressionProperties) {
+                /** @type {?} */
+                const expressionProperty = field.expressionProperties[key];
+                if (typeof expressionProperty === 'string' || isFunction(expressionProperty)) {
+                    field._expressionProperties[key] = {
+                        expression: this._evalExpression(expressionProperty, key === 'templateOptions.disabled' && field.parent.expressionProperties && field.parent.expressionProperties.hasOwnProperty('templateOptions.disabled')
+                            ? (/**
+                             * @return {?}
+                             */
+                            () => field.parent.templateOptions.disabled)
+                            : undefined),
+                    };
+                    if (key === 'templateOptions.disabled') {
+                        Object.defineProperty(field._expressionProperties[key], 'expressionValue', {
+                            get: (/**
+                             * @return {?}
+                             */
+                            () => field.templateOptions.disabled),
+                            set: (/**
+                             * @return {?}
+                             */
+                            () => { }),
+                            enumerable: true,
+                            configurable: true,
+                        });
+                    }
                 }
-                else if (expr instanceof Observable) {
-                    const subscribe = () => expr.subscribe((v) => {
-                        this.evalExpr(field, key, v);
-                    });
+                else if (expressionProperty instanceof Observable) {
+                    /** @type {?} */
+                    const subscribe = (/**
+                     * @return {?}
+                     */
+                    () => ((/** @type {?} */ (expressionProperty)))
+                        .subscribe((/**
+                     * @param {?} v
+                     * @return {?}
+                     */
+                    v => {
+                        this.setExprValue(field, key, v);
+                        if (field.options && field.options._markForCheck) {
+                            field.options._markForCheck(field);
+                        }
+                    })));
+                    /** @type {?} */
                     let subscription = subscribe();
+                    /** @type {?} */
                     const onInit = field.hooks.onInit;
-                    field.hooks.onInit = () => {
+                    field.hooks.onInit = (/**
+                     * @return {?}
+                     */
+                    () => {
                         if (subscription === null) {
                             subscription = subscribe();
                         }
                         return onInit && onInit(field);
-                    };
+                    });
+                    /** @type {?} */
                     const onDestroy = field.hooks.onDestroy;
-                    field.hooks.onDestroy = () => {
+                    field.hooks.onDestroy = (/**
+                     * @return {?}
+                     */
+                    () => {
                         onDestroy && onDestroy(field);
                         subscription.unsubscribe();
                         subscription = null;
-                    };
+                    });
                 }
-            });
-        }
-    }
-    postPopulate(field) {
-        if (field.parent) {
-            return;
-        }
-        if (!field.options.checkExpressions) {
-            field.options.checkExpressions = (f, ignoreCache = false) => {
-                reduceFormUpdateValidityCalls(f.form, () => this.checkExpressions(f, ignoreCache));
-                const options = field.options;
-                options._hiddenFieldsForCheck.sort((f) => (f.hide ? -1 : 1)).forEach((f) => this.changeHideState(f, f.hide));
-                options._hiddenFieldsForCheck = [];
-            };
-            field.options._checkField = (f, ignoreCache) => {
-                console.warn(`Formly: 'options._checkField' is deprecated since v6.0, use 'options.checkExpressions' instead.`);
-                field.options.checkExpressions(f, ignoreCache);
-            };
-        }
-    }
-    parseExpressions(field, path, expr) {
-        let parentExpression;
-        if (field.parent && ['hide', 'templateOptions.disabled'].includes(path)) {
-            parentExpression = evalStringExpression(`!!field.parent.${path}`, ['field']);
-        }
-        expr = expr || (() => false);
-        if (typeof expr === 'string') {
-            expr = evalStringExpression(expr, ['model', 'formState', 'field']);
-        }
-        let currentValue;
-        return (ignoreCache) => {
-            const exprValue = evalExpression(parentExpression ? (...args) => parentExpression(field) || expr(...args) : expr, { field }, [field.model, field.options.formState, field]);
-            if (ignoreCache ||
-                (currentValue !== exprValue &&
-                    (!isObject(exprValue) || JSON.stringify(exprValue) !== JSON.stringify(currentValue)))) {
-                currentValue = exprValue;
-                this.evalExpr(field, path, exprValue);
-                return true;
             }
+        }
+        if (field.hideExpression) {
+            // delete hide value in order to force re-evaluate it in FormlyFormExpression.
+            delete field.hide;
+            /** @type {?} */
+            let parent = field.parent;
+            while (parent && !parent.hideExpression) {
+                parent = parent.parent;
+            }
+            field.hideExpression = this._evalExpression(field.hideExpression, parent && parent.hideExpression ? (/**
+             * @return {?}
+             */
+            () => parent.hide) : undefined);
+        }
+        else {
+            wrapProperty(field, 'hide', (/**
+             * @param {?} __0
+             * @return {?}
+             */
+            ({ currentValue, firstChange }) => {
+                field._hide = currentValue;
+                if (!firstChange || (firstChange && currentValue === true)) {
+                    field.options._hiddenFieldsForCheck.push(field);
+                }
+            }));
+        }
+    }
+    /**
+     * @private
+     * @param {?} expression
+     * @param {?=} parentExpression
+     * @return {?}
+     */
+    _evalExpression(expression, parentExpression) {
+        expression = expression || ((/**
+         * @return {?}
+         */
+        () => false));
+        if (typeof expression === 'string') {
+            expression = evalStringExpression(expression, ['model', 'formState', 'field']);
+        }
+        return parentExpression
+            ? (/**
+             * @param {?} model
+             * @param {?} formState
+             * @param {?} field
+             * @return {?}
+             */
+            (model, formState, field) => parentExpression() || expression(model, formState, field))
+            : expression;
+    }
+    /**
+     * @private
+     * @param {?} field
+     * @param {?=} ignoreCache
+     * @return {?}
+     */
+    checkField(field, ignoreCache = false) {
+        this._checkField(field, ignoreCache);
+        field.options._hiddenFieldsForCheck
+            .sort((/**
+         * @param {?} f
+         * @return {?}
+         */
+        f => f.hide ? -1 : 1))
+            .forEach((/**
+         * @param {?} f
+         * @return {?}
+         */
+        f => this.toggleFormControl(f, f.hide)));
+        field.options._hiddenFieldsForCheck = [];
+    }
+    /**
+     * @private
+     * @param {?} field
+     * @param {?=} ignoreCache
+     * @return {?}
+     */
+    _checkField(field, ignoreCache = false) {
+        /** @type {?} */
+        let markForCheck = false;
+        field.fieldGroup.forEach((/**
+         * @param {?} f
+         * @return {?}
+         */
+        f => {
+            this.checkFieldExpressionChange(f, ignoreCache) && (markForCheck = true);
+            if (this.checkFieldVisibilityChange(f, ignoreCache)) {
+                field.options._hiddenFieldsForCheck.push(f);
+                markForCheck = true;
+            }
+            if (f.fieldGroup && f.fieldGroup.length > 0) {
+                this._checkField(f, ignoreCache);
+            }
+        }));
+        if (markForCheck && field.options && field.options._markForCheck) {
+            field.options._markForCheck(field);
+        }
+    }
+    /**
+     * @private
+     * @param {?} field
+     * @param {?} ignoreCache
+     * @return {?}
+     */
+    checkFieldExpressionChange(field, ignoreCache) {
+        if (!field || !field._expressionProperties) {
             return false;
-        };
-    }
-    checkExpressions(field, ignoreCache = false) {
-        if (!field) {
-            return;
         }
-        if (field._expressions) {
-            for (const key of Object.keys(field._expressions)) {
-                field._expressions[key](ignoreCache);
+        /** @type {?} */
+        let markForCheck = false;
+        /** @type {?} */
+        const expressionProperties = field._expressionProperties;
+        for (const key in expressionProperties) {
+            /** @type {?} */
+            let expressionValue = evalExpression(expressionProperties[key].expression, { field }, [field.model, field.options.formState, field]);
+            if (key === 'templateOptions.disabled') {
+                expressionValue = !!expressionValue;
+            }
+            if (ignoreCache || (expressionProperties[key].expressionValue !== expressionValue
+                && (!isObject(expressionValue) || JSON.stringify(expressionValue) !== JSON.stringify(expressionProperties[key].expressionValue)))) {
+                markForCheck = true;
+                expressionProperties[key].expressionValue = expressionValue;
+                this.setExprValue(field, key, expressionValue);
             }
         }
-        if (field.fieldGroup) {
-            field.fieldGroup.forEach((f) => this.checkExpressions(f, ignoreCache));
-        }
+        return markForCheck;
     }
-    changeDisabledState(field, value) {
+    /**
+     * @private
+     * @param {?} field
+     * @param {?} ignoreCache
+     * @return {?}
+     */
+    checkFieldVisibilityChange(field, ignoreCache) {
+        if (!field || isNullOrUndefined(field.hideExpression)) {
+            return false;
+        }
+        /** @type {?} */
+        const hideExpressionResult = !!evalExpression(field.hideExpression, { field }, [field.model, field.options.formState, field]);
+        /** @type {?} */
+        let markForCheck = false;
+        if (hideExpressionResult !== field.hide || ignoreCache) {
+            markForCheck = true;
+            // toggle hide
+            field.hide = hideExpressionResult;
+            field.templateOptions.hidden = hideExpressionResult;
+        }
+        return markForCheck;
+    }
+    /**
+     * @private
+     * @param {?} field
+     * @param {?} value
+     * @return {?}
+     */
+    setDisabledState(field, value) {
         if (field.fieldGroup) {
             field.fieldGroup
-                .filter((f) => !f.expressionProperties || !f.expressionProperties.hasOwnProperty('templateOptions.disabled'))
-                .forEach((f) => this.changeDisabledState(f, value));
+                .filter((/**
+             * @param {?} f
+             * @return {?}
+             */
+            f => !f.expressionProperties || !f.expressionProperties.hasOwnProperty('templateOptions.disabled')))
+                .forEach((/**
+             * @param {?} f
+             * @return {?}
+             */
+            f => this.setDisabledState(f, value)));
         }
         if (field.key && field.templateOptions.disabled !== value) {
             field.templateOptions.disabled = value;
         }
     }
-    changeHideState(field, hide) {
+    /**
+     * @private
+     * @param {?} field
+     * @param {?} hide
+     * @return {?}
+     */
+    toggleFormControl(field, hide) {
         if (field.formControl && field.key) {
             defineHiddenProp(field, '_hide', !!(hide || field.hide));
+            /** @type {?} */
             const c = field.formControl;
             if (c['_fields'].length > 1) {
                 updateValidity(c);
             }
-            hide === true && c['_fields'].every((f) => !!f._hide) ? unregisterControl(field) : registerControl(field);
+            hide === true && c['_fields'].every((/**
+             * @param {?} f
+             * @return {?}
+             */
+            f => !!f._hide))
+                ? unregisterControl(field)
+                : registerControl(field);
         }
         if (field.fieldGroup) {
-            field.fieldGroup.filter((f) => !f.hideExpression).forEach((f) => this.changeHideState(f, hide));
+            field.fieldGroup
+                .filter((/**
+             * @param {?} f
+             * @return {?}
+             */
+            f => !f.hideExpression))
+                .forEach((/**
+             * @param {?} f
+             * @return {?}
+             */
+            f => this.toggleFormControl(f, hide)));
         }
         if (field.options.fieldChanges) {
-            field.options.fieldChanges.next({ field, type: 'hidden', value: hide });
+            field.options.fieldChanges.next((/** @type {?} */ ({ field, type: 'hidden', value: hide })));
         }
     }
-    evalExpr(field, prop, value) {
+    /**
+     * @private
+     * @param {?} field
+     * @param {?} prop
+     * @param {?} value
+     * @return {?}
+     */
+    setExprValue(field, prop, value) {
         try {
+            /** @type {?} */
             let target = field;
+            /** @type {?} */
             const paths = prop.split('.');
+            /** @type {?} */
             const lastIndex = paths.length - 1;
             for (let i = 0; i < lastIndex; i++) {
                 target = target[paths[i]];
@@ -1421,56 +2534,138 @@ class FieldExpressionExtension {
             throw error;
         }
         if (prop === 'templateOptions.disabled' && field.key) {
-            this.changeDisabledState(field, value);
+            this.setDisabledState(field, value);
         }
         if (prop.indexOf('model.') === 0) {
-            const key = prop.replace(/^model\./, ''), control = field.key && field.key === key ? field.formControl : field.form.get(key);
-            if (control && !(isNil(control.value) && isNil(value)) && control.value !== value) {
+            /** @type {?} */
+            const path = prop.replace(/^model\./, '');
+            /** @type {?} */
+            const control = field.key && prop === path ? field.formControl : field.parent.formControl.get(path);
+            if (control
+                && !(isNullOrUndefined(control.value) && isNullOrUndefined(value))
+                && control.value !== value) {
                 control.patchValue(value, { emitEvent: false });
             }
         }
+        this.emitExpressionChanges(field, prop, value);
+    }
+    /**
+     * @private
+     * @param {?} field
+     * @param {?} property
+     * @param {?} value
+     * @return {?}
+     */
+    emitExpressionChanges(field, property, value) {
+        if (!field.options.fieldChanges) {
+            return;
+        }
+        field.options.fieldChanges.next({
+            field: field,
+            type: 'expressionChanges',
+            property,
+            value,
+        });
     }
 }
 
-/** @experimental */
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/**
+ * \@experimental
+ */
 class FieldValidationExtension {
-    constructor(config) {
-        this.config = config;
+    /**
+     * @param {?} formlyConfig
+     */
+    constructor(formlyConfig) {
+        this.formlyConfig = formlyConfig;
     }
+    /**
+     * @param {?} field
+     * @return {?}
+     */
     onPopulate(field) {
         this.initFieldValidation(field, 'validators');
         this.initFieldValidation(field, 'asyncValidators');
     }
+    /**
+     * @private
+     * @param {?} field
+     * @param {?} type
+     * @return {?}
+     */
     initFieldValidation(field, type) {
+        /** @type {?} */
         const validators = [];
         if (type === 'validators' && !(field.hasOwnProperty('fieldGroup') && !field.key)) {
             validators.push(this.getPredefinedFieldValidation(field));
         }
         if (field[type]) {
-            for (const validatorName of Object.keys(field[type])) {
+            for (const validatorName in field[type]) {
+                if (validatorName === 'validation' && !Array.isArray(field[type].validation)) {
+                    field[type].validation = [field[type].validation];
+                    console.warn(`NgxFormly(${field.key}): passing a non array value to the 'validation' is deprecated, pass an array instead`);
+                }
                 validatorName === 'validation'
-                    ? validators.push(...field[type].validation.map((v) => this.wrapNgValidatorFn(field, v)))
+                    ? validators.push(...field[type].validation.map((/**
+                     * @param {?} v
+                     * @return {?}
+                     */
+                    v => this.wrapNgValidatorFn(field, v))))
                     : validators.push(this.wrapNgValidatorFn(field, field[type][validatorName], validatorName));
             }
         }
         defineHiddenProp(field, '_' + type, validators);
     }
+    /**
+     * @private
+     * @param {?} field
+     * @return {?}
+     */
     getPredefinedFieldValidation(field) {
+        /** @type {?} */
         let VALIDATORS = [];
-        FORMLY_VALIDATORS.forEach((opt) => observe(field, ['templateOptions', opt], ({ currentValue, firstChange }) => {
-            VALIDATORS = VALIDATORS.filter((o) => o !== opt);
+        FORMLY_VALIDATORS.forEach((/**
+         * @param {?} opt
+         * @return {?}
+         */
+        opt => wrapProperty(field.templateOptions, opt, (/**
+         * @param {?} __0
+         * @return {?}
+         */
+        ({ currentValue, firstChange }) => {
+            VALIDATORS = VALIDATORS.filter((/**
+             * @param {?} o
+             * @return {?}
+             */
+            o => o !== opt));
             if (currentValue != null && currentValue !== false) {
                 VALIDATORS.push(opt);
             }
             if (!firstChange && field.formControl) {
                 updateValidity(field.formControl);
             }
-        }));
-        return (control) => {
+        }))));
+        return (/**
+         * @param {?} control
+         * @return {?}
+         */
+        (control) => {
             if (VALIDATORS.length === 0) {
                 return null;
             }
-            return Validators.compose(VALIDATORS.map((opt) => () => {
+            return Validators.compose(VALIDATORS.map((/**
+             * @param {?} opt
+             * @return {?}
+             */
+            opt => (/**
+             * @return {?}
+             */
+            () => {
+                /** @type {?} */
                 const value = field.templateOptions[opt];
                 switch (opt) {
                     case 'required':
@@ -1486,16 +2681,24 @@ class FieldValidationExtension {
                     case 'max':
                         return Validators.max(value)(control);
                 }
-            }))(control);
-        };
+            }))))(control);
+        });
     }
+    /**
+     * @private
+     * @param {?} field
+     * @param {?} validator
+     * @param {?=} validatorName
+     * @return {?}
+     */
     wrapNgValidatorFn(field, validator, validatorName) {
+        /** @type {?} */
         let validatorOption = null;
         if (typeof validator === 'string') {
-            validatorOption = clone(this.config.getValidator(validator));
+            validatorOption = clone(this.formlyConfig.getValidator(validator));
         }
         if (typeof validator === 'object' && validator.name) {
-            validatorOption = clone(this.config.getValidator(validator.name));
+            validatorOption = clone(this.formlyConfig.getValidator(validator.name));
             if (validator.options) {
                 validatorOption.options = validator.options;
             }
@@ -1514,317 +2717,563 @@ class FieldValidationExtension {
                 validation: validator,
             };
         }
-        return (control) => {
-            let errors = validatorOption.validation(control, field, validatorOption.options);
-            if (validatorName) {
-                if (isPromise(errors)) {
-                    return errors.then((v) => this.handleAsyncResult(field, v, validatorOption));
-                }
-                if (isObservable(errors)) {
-                    return errors.pipe(map((v) => this.handleAsyncResult(field, v, validatorOption)));
-                }
-                errors = !!errors;
+        return (/**
+         * @param {?} control
+         * @return {?}
+         */
+        (control) => {
+            /** @type {?} */
+            const errors = validatorOption.validation(control, field, validatorOption.options);
+            if (isPromise(errors)) {
+                return errors.then((/**
+                 * @param {?} v
+                 * @return {?}
+                 */
+                v => this.handleAsyncResult(field, validatorName ? !!v : v, validatorOption)));
             }
-            return this.handleResult(field, errors, validatorOption);
-        };
+            if (isObservable(errors) && !validatorName) {
+                return errors.pipe(map((/**
+                 * @param {?} v
+                 * @return {?}
+                 */
+                v => this.handleAsyncResult(field, v, validatorOption))));
+            }
+            return this.handleResult(field, validatorName ? !!errors : errors, validatorOption);
+        });
     }
-    handleAsyncResult(field, isValid, options) {
+    /**
+     * @private
+     * @param {?} field
+     * @param {?} errors
+     * @param {?} options
+     * @return {?}
+     */
+    handleAsyncResult(field, errors, options) {
         // workaround for https://github.com/angular/angular/issues/13200
-        field.options.detectChanges(field);
-        return this.handleResult(field, !!isValid, options);
+        if (field.options && field.options._markForCheck) {
+            field.options._markForCheck(field);
+        }
+        return this.handleResult(field, errors, options);
     }
+    /**
+     * @private
+     * @param {?} field
+     * @param {?} errors
+     * @param {?} __2
+     * @return {?}
+     */
     handleResult(field, errors, { name, options }) {
         if (typeof errors === 'boolean') {
             errors = errors ? null : { [name]: options ? options : true };
         }
+        /** @type {?} */
         const ctrl = field.formControl;
-        ctrl && ctrl['_childrenErrors'] && ctrl['_childrenErrors'][name] && ctrl['_childrenErrors'][name]();
-        if (ctrl && errors && errors[name]) {
-            const errorPath = errors[name].errorPath ? errors[name].errorPath : (options || {}).errorPath;
+        ctrl['_childrenErrors'] && ctrl['_childrenErrors'][name] && ctrl['_childrenErrors'][name]();
+        if (errors && errors[name]) {
+            /** @type {?} */
+            const errorPath = errors[name].errorPath
+                ? errors[name].errorPath
+                : (options || {}).errorPath;
+            /** @type {?} */
             const childCtrl = errorPath ? field.formControl.get(errorPath) : null;
             if (childCtrl) {
-                const _a = errors[name], { errorPath } = _a, opts = __rest(_a, ["errorPath"]);
-                childCtrl.setErrors(Object.assign(Object.assign({}, (childCtrl.errors || {})), { [name]: opts }));
+                const _a = errors[name], opts = __rest(_a, ["errorPath"]);
+                childCtrl.setErrors(Object.assign({}, (childCtrl.errors || {}), { [name]: opts }));
                 !ctrl['_childrenErrors'] && defineHiddenProp(ctrl, '_childrenErrors', {});
-                ctrl['_childrenErrors'][name] = () => {
+                ctrl['_childrenErrors'][name] = (/**
+                 * @return {?}
+                 */
+                () => {
                     const _a = childCtrl.errors || {}, _b = name, toDelete = _a[_b], childErrors = __rest(_a, [typeof _b === "symbol" ? _b : _b + ""]);
                     childCtrl.setErrors(Object.keys(childErrors).length === 0 ? null : childErrors);
-                };
+                });
             }
         }
         return errors;
     }
 }
 
-/** @experimental */
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/**
+ * \@experimental
+ */
 class FieldFormExtension {
-    prePopulate(field) {
-        if (!this.root) {
-            this.root = field;
-        }
-        if (field.parent) {
-            Object.defineProperty(field, 'form', {
-                get: () => field.parent.formControl,
-                configurable: true,
-            });
-        }
+    /**
+     * @param {?} config
+     */
+    constructor(config) {
+        this.config = config;
     }
+    /**
+     * @param {?} field
+     * @return {?}
+     */
     onPopulate(field) {
         if (field.key) {
             this.addFormControl(field);
         }
-        if (field.form && field.hasOwnProperty('fieldGroup') && !field.key) {
-            defineHiddenProp(field, 'formControl', field.form);
+        if (field.parent && field.fieldGroup && !field.key) {
+            defineHiddenProp(field, 'formControl', field.parent.formControl);
         }
     }
+    /**
+     * @param {?} field
+     * @return {?}
+     */
     postPopulate(field) {
-        if (this.root !== field) {
+        if (field.parent) {
             return;
         }
-        this.root = null;
-        const updateValidity = this.setValidators(field);
-        updateValidity && field.form._updateTreeValidity();
+        /** @type {?} */
+        const fieldsToUpdate = this.setValidators(field);
+        if (fieldsToUpdate.length === 0) {
+            return;
+        }
+        if (fieldsToUpdate.length === 1) {
+            fieldsToUpdate[0].formControl.updateValueAndValidity();
+        }
+        else {
+            ((/** @type {?} */ (field.formControl)))._updateTreeValidity();
+        }
     }
+    /**
+     * @private
+     * @param {?} field
+     * @return {?}
+     */
     addFormControl(field) {
+        /** @type {?} */
         let control = findControl(field);
         if (!control) {
+            /** @type {?} */
             const controlOptions = { updateOn: field.modelOptions.updateOn };
-            control = field.fieldGroup
-                ? new FormGroup({}, controlOptions)
-                : new FormControl({ value: getFieldValue(field), disabled: false }, controlOptions);
+            /** @type {?} */
+            const value = getFieldValue(field);
+            /** @type {?} */
+            const ref = this.config ? this.config.resolveFieldTypeRef(field) : null;
+            if (ref && ref.componentType && ref.componentType['createControl']) {
+                /** @type {?} */
+                const component = ref.componentType;
+                console.warn(`NgxFormly: '${component.name}::createControl' is deprecated since v5.0, use 'prePopulate' hook instead.`);
+                control = component['createControl'](value, field);
+            }
+            else if (field.fieldGroup) {
+                // TODO: move to postPopulate
+                control = new FormGroup({}, controlOptions);
+            }
+            else {
+                control = new FormControl(value, controlOptions);
+            }
         }
         registerControl(field, control);
     }
+    /**
+     * @private
+     * @param {?} field
+     * @return {?}
+     */
     setValidators(field) {
-        let updateValidity$1 = false;
+        /** @type {?} */
+        let updateValidity$$1 = false;
         if (field.key || !field.parent) {
             const { formControl: c } = field;
+            /** @type {?} */
             const disabled = field.templateOptions ? field.templateOptions.disabled : false;
             if (disabled && c.enabled) {
                 c.disable({ emitEvent: false, onlySelf: true });
-                updateValidity$1 = true;
+                updateValidity$$1 = true;
             }
             if (null === c.validator || null === c.asyncValidator) {
-                c.setValidators(() => {
+                c.setValidators((/**
+                 * @return {?}
+                 */
+                () => {
+                    /** @type {?} */
                     const v = Validators.compose(this.mergeValidators(field, '_validators'));
                     return v ? v(c) : null;
-                });
-                c.setAsyncValidators(() => {
+                }));
+                c.setAsyncValidators((/**
+                 * @return {?}
+                 */
+                () => {
+                    /** @type {?} */
                     const v = Validators.composeAsync(this.mergeValidators(field, '_asyncValidators'));
                     return v ? v(c) : of(null);
-                });
+                }));
                 if (!c.parent) {
                     updateValidity(c);
                 }
                 else {
-                    updateValidity$1 = true;
+                    updateValidity$$1 = true;
                 }
             }
         }
-        (field.fieldGroup || []).forEach((f) => f && this.setValidators(f) && (updateValidity$1 = true));
-        return updateValidity$1;
+        /** @type {?} */
+        const fieldsToUpdate = updateValidity$$1 ? [field] : [];
+        (field.fieldGroup || []).forEach((/**
+         * @param {?} f
+         * @return {?}
+         */
+        f => {
+            /** @type {?} */
+            const childrenToUpdate = this.setValidators(f);
+            if (!updateValidity$$1) {
+                fieldsToUpdate.push(...childrenToUpdate);
+            }
+        }));
+        return fieldsToUpdate;
     }
+    /**
+     * @private
+     * @template T
+     * @param {?} field
+     * @param {?} type
+     * @return {?}
+     */
     mergeValidators(field, type) {
+        /** @type {?} */
         const validators = [];
+        /** @type {?} */
         const c = field.formControl;
         if (c && c['_fields'] && c['_fields'].length > 1) {
             c['_fields']
-                .filter((f) => !f._hide)
-                .forEach((f) => validators.push(...f[type]));
+                .filter((/**
+             * @param {?} f
+             * @return {?}
+             */
+            (f) => !f._hide))
+                .forEach((/**
+             * @param {?} f
+             * @return {?}
+             */
+            (f) => validators.push(...f[type])));
         }
         else {
             validators.push(...field[type]);
         }
         if (field.fieldGroup) {
             field.fieldGroup
-                .filter((f) => f && !f.key && f.fieldGroup)
-                .forEach((f) => validators.push(...this.mergeValidators(f, type)));
+                .filter((/**
+             * @param {?} f
+             * @return {?}
+             */
+            f => !f.key && f.fieldGroup))
+                .forEach((/**
+             * @param {?} f
+             * @return {?}
+             */
+            f => validators.push(...this.mergeValidators(f, type))));
         }
         return validators;
     }
 }
 
-/** @experimental */
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/**
+ * \@experimental
+ */
 class CoreExtension {
-    constructor(config) {
-        this.config = config;
+    /**
+     * @param {?} formlyConfig
+     */
+    constructor(formlyConfig) {
+        this.formlyConfig = formlyConfig;
         this.formId = 0;
     }
+    /**
+     * @param {?} field
+     * @return {?}
+     */
     prePopulate(field) {
-        const root = field.parent;
-        this.initRootOptions(field);
-        if (root) {
-            Object.defineProperty(field, 'options', { get: () => root.options, configurable: true });
-            Object.defineProperty(field, 'model', {
-                get: () => (field.key && field.fieldGroup ? getFieldValue(field) : root.model),
-                configurable: true,
-            });
-        }
         this.getFieldComponentInstance(field).prePopulate();
+        if (field.parent) {
+            return;
+        }
+        /** @type {?} */
+        const fieldTransforms = (field.options && field.options.fieldTransform) || this.formlyConfig.extras.fieldTransform;
+        (Array.isArray(fieldTransforms) ? fieldTransforms : [fieldTransforms]).forEach((/**
+         * @param {?} fieldTransform
+         * @return {?}
+         */
+        fieldTransform => {
+            if (fieldTransform) {
+                console.warn(`NgxFormly: fieldTransform is deprecated since v5.0, use custom extension instead.`);
+                /** @type {?} */
+                const fieldGroup = fieldTransform(field.fieldGroup, field.model, (/** @type {?} */ (field.formControl)), field.options);
+                if (!fieldGroup) {
+                    throw new Error('fieldTransform must return an array of fields');
+                }
+            }
+        }));
     }
+    /**
+     * @param {?} field
+     * @return {?}
+     */
     onPopulate(field) {
         this.initFieldOptions(field);
         this.getFieldComponentInstance(field).onPopulate();
         if (field.fieldGroup) {
-            field.fieldGroup.forEach((f, index) => {
-                if (f) {
-                    Object.defineProperty(f, 'parent', { get: () => field, configurable: true });
-                    Object.defineProperty(f, 'index', { get: () => index, configurable: true });
-                }
+            field.fieldGroup.forEach((/**
+             * @param {?} f
+             * @param {?} index
+             * @return {?}
+             */
+            (f, index) => {
+                Object.defineProperty(f, 'parent', { get: (/**
+                     * @return {?}
+                     */
+                    () => field), configurable: true });
+                Object.defineProperty(f, 'index', { get: (/**
+                     * @return {?}
+                     */
+                    () => index), configurable: true });
                 this.formId++;
-            });
+            }));
         }
     }
+    /**
+     * @param {?} field
+     * @return {?}
+     */
     postPopulate(field) {
         this.getFieldComponentInstance(field).postPopulate();
     }
-    initRootOptions(field) {
-        if (field.parent) {
+    /**
+     * @private
+     * @param {?} field
+     * @return {?}
+     */
+    initFieldOptions(field) {
+        /** @type {?} */
+        const root = (/** @type {?} */ (field.parent));
+        if (!root) {
             return;
         }
-        const options = field.options;
-        field.options.formState = field.options.formState || {};
-        if (!options.showError) {
-            options.showError = this.config.extras.showError;
-        }
-        if (!options.fieldChanges) {
-            defineHiddenProp(options, 'fieldChanges', new Subject());
-        }
-        if (!options._hiddenFieldsForCheck) {
-            options._hiddenFieldsForCheck = [];
-        }
-        options._markForCheck = (f) => {
-            console.warn(`Formly: 'options._markForCheck' is deprecated since v6.0, use 'options.detectChanges' instead.`);
-            options.detectChanges(f);
-        };
-        options.detectChanges = (f) => {
-            if (f._componentRefs) {
-                f._componentRefs.forEach((ref) => {
-                    // NOTE: we cannot use ref.changeDetectorRef, see https://github.com/ngx-formly/ngx-formly/issues/2191
-                    const changeDetectorRef = ref.injector.get(ChangeDetectorRef);
-                    changeDetectorRef.markForCheck();
-                });
-            }
-            if (f.fieldGroup) {
-                f.fieldGroup.forEach((f) => f && options.detectChanges(f));
-            }
-        };
-        options.resetModel = (model) => {
-            model = clone(model !== null && model !== void 0 ? model : options._initialModel);
-            if (field.model) {
-                Object.keys(field.model).forEach((k) => delete field.model[k]);
-                Object.assign(field.model, model || {});
-            }
-            options.build(field);
-            field.form.reset(model);
-            if (options.parentForm && options.parentForm.control === field.formControl) {
-                options.parentForm.submitted = false;
-            }
-        };
-        options.updateInitialValue = () => (options._initialModel = clone(field.model));
-        field.options.updateInitialValue();
-    }
-    initFieldOptions(field) {
+        Object.defineProperty(field, 'form', { get: (/**
+             * @return {?}
+             */
+            () => root.formControl), configurable: true });
+        Object.defineProperty(field, 'options', { get: (/**
+             * @return {?}
+             */
+            () => root.options), configurable: true });
+        Object.defineProperty(field, 'model', {
+            get: (/**
+             * @return {?}
+             */
+            () => field.key && field.fieldGroup ? getFieldValue(field) : root.model),
+            configurable: true,
+        });
         reverseDeepMerge(field, {
             id: getFieldId(`formly_${this.formId}`, field, field['index']),
             hooks: {},
             modelOptions: {},
-            templateOptions: !field.type || !field.key
-                ? {}
-                : {
-                    label: '',
-                    placeholder: '',
-                    focus: false,
-                    disabled: false,
-                },
+            templateOptions: !field.type || !field.key ? {} : {
+                label: '',
+                placeholder: '',
+                focus: false,
+                disabled: false,
+            },
         });
-        if (field.type !== 'formly-template' &&
-            (field.template || (field.expressionProperties && field.expressionProperties.template))) {
+        if (field.lifecycle) {
+            console.warn(`NgxFormly: 'lifecycle' is deprecated since v5.0, use 'hooks' instead.`);
+        }
+        if (field.type !== 'formly-template'
+            && (field.template
+                || (field.expressionProperties && field.expressionProperties.template))) {
+            if (field.type) {
+                console.warn(`NgxFormly: passing 'type' property is not allowed when 'template' is set.`);
+            }
             field.type = 'formly-template';
         }
         if (!field.type && field.fieldGroup) {
             field.type = 'formly-group';
         }
         if (field.type) {
-            this.config.getMergedField(field);
+            this.formlyConfig.getMergedField(field);
         }
-        if (!field['autoClear'] && !isUndefined(field.defaultValue) && isUndefined(getFieldValue(field))) {
+        if (field.parent && !field['autoClear'] && !isUndefined(field.defaultValue) && isUndefined(getFieldValue(field))) {
             assignFieldValue(field, field.defaultValue);
         }
-        field.wrappers = field.wrappers || [];
+        this.initFieldWrappers(field);
     }
+    /**
+     * @private
+     * @param {?} field
+     * @return {?}
+     */
+    initFieldWrappers(field) {
+        field.wrappers = field.wrappers || [];
+        /** @type {?} */
+        const fieldTemplateManipulators = Object.assign({ preWrapper: [], postWrapper: [] }, (field.templateOptions.templateManipulators || {}));
+        field.wrappers = [
+            ...this.formlyConfig.templateManipulators.preWrapper.map((/**
+             * @param {?} m
+             * @return {?}
+             */
+            m => m(field))),
+            ...fieldTemplateManipulators.preWrapper.map((/**
+             * @param {?} m
+             * @return {?}
+             */
+            m => m(field))),
+            ...field.wrappers,
+            ...this.formlyConfig.templateManipulators.postWrapper.map((/**
+             * @param {?} m
+             * @return {?}
+             */
+            m => m(field))),
+            ...fieldTemplateManipulators.postWrapper.map((/**
+             * @param {?} m
+             * @return {?}
+             */
+            m => m(field))),
+        ].filter((/**
+         * @param {?} el
+         * @param {?} i
+         * @param {?} a
+         * @return {?}
+         */
+        (el, i, a) => el && i === a.indexOf(el)));
+    }
+    /**
+     * @private
+     * @param {?} field
+     * @return {?}
+     */
     getFieldComponentInstance(field) {
-        const componentRef = this.config.resolveFieldTypeRef(field);
-        const instance = componentRef ? componentRef.instance : {};
+        /** @type {?} */
+        const componentRef = this.formlyConfig.resolveFieldTypeRef(field);
+        /** @type {?} */
+        const instance = componentRef ? (/** @type {?} */ (componentRef.instance)) : {};
         return {
-            prePopulate: () => instance.prePopulate && instance.prePopulate(field),
-            onPopulate: () => instance.onPopulate && instance.onPopulate(field),
-            postPopulate: () => instance.postPopulate && instance.postPopulate(field),
+            prePopulate: (/**
+             * @return {?}
+             */
+            () => instance.prePopulate && instance.prePopulate(field)),
+            onPopulate: (/**
+             * @return {?}
+             */
+            () => instance.onPopulate && instance.onPopulate(field)),
+            postPopulate: (/**
+             * @return {?}
+             */
+            () => instance.postPopulate && instance.postPopulate(field)),
         };
     }
 }
 
-var FormlyModule_1;
-function defaultFormlyConfig(config) {
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/**
+ * @param {?} formlyConfig
+ * @return {?}
+ */
+function defaultFormlyConfig(formlyConfig) {
     return {
         types: [
             { name: 'formly-group', component: FormlyGroup },
             { name: 'formly-template', component: FormlyTemplateType },
         ],
         extensions: [
-            { name: 'core', extension: new CoreExtension(config) },
-            { name: 'field-validation', extension: new FieldValidationExtension(config) },
-            { name: 'field-form', extension: new FieldFormExtension() },
+            { name: 'core', extension: new CoreExtension(formlyConfig) },
+            { name: 'field-validation', extension: new FieldValidationExtension(formlyConfig) },
+            { name: 'field-form', extension: new FieldFormExtension(formlyConfig) },
             { name: 'field-expression', extension: new FieldExpressionExtension() },
         ],
     };
 }
-let FormlyModule = FormlyModule_1 = class FormlyModule {
+class FormlyModule {
+    /**
+     * @param {?} configService
+     * @param {?=} configs
+     */
     constructor(configService, configs = []) {
         if (!configs) {
             return;
         }
-        configs.forEach((config) => configService.addConfig(config));
+        configs.forEach((/**
+         * @param {?} config
+         * @return {?}
+         */
+        config => configService.addConfig(config)));
     }
+    /**
+     * @param {?=} config
+     * @return {?}
+     */
     static forRoot(config = {}) {
         return {
-            ngModule: FormlyModule_1,
+            ngModule: FormlyModule,
             providers: [
                 { provide: FORMLY_CONFIG, multi: true, useFactory: defaultFormlyConfig, deps: [FormlyConfig] },
                 { provide: FORMLY_CONFIG, useValue: config, multi: true },
+                { provide: ANALYZE_FOR_ENTRY_COMPONENTS, useValue: config, multi: true },
                 FormlyConfig,
                 FormlyFormBuilder,
             ],
         };
     }
+    /**
+     * @param {?=} config
+     * @return {?}
+     */
     static forChild(config = {}) {
         return {
-            ngModule: FormlyModule_1,
-            providers: [{ provide: FORMLY_CONFIG, useValue: config, multi: true }, FormlyFormBuilder],
+            ngModule: FormlyModule,
+            providers: [
+                { provide: FORMLY_CONFIG, useValue: config, multi: true },
+                { provide: ANALYZE_FOR_ENTRY_COMPONENTS, useValue: config, multi: true },
+                FormlyFormBuilder,
+            ],
         };
     }
-};
+}
+FormlyModule.decorators = [
+    { type: NgModule, args: [{
+                declarations: [
+                    FormlyForm,
+                    FormlyField,
+                    FormlyAttributes,
+                    FormlyGroup,
+                    FormlyValidationMessage,
+                    FormlyTemplateType,
+                ],
+                entryComponents: [FormlyGroup, FormlyTemplateType],
+                exports: [FormlyForm, FormlyField, FormlyAttributes, FormlyGroup, FormlyValidationMessage],
+                imports: [CommonModule],
+            },] }
+];
+/** @nocollapse */
 FormlyModule.ctorParameters = () => [
     { type: FormlyConfig },
     { type: Array, decorators: [{ type: Optional }, { type: Inject, args: [FORMLY_CONFIG,] }] }
 ];
-FormlyModule = FormlyModule_1 = __decorate([
-    NgModule({
-        declarations: [FormlyForm, FormlyField, FormlyAttributes, FormlyGroup, FormlyValidationMessage, FormlyTemplateType],
-        exports: [FormlyForm, FormlyField, FormlyAttributes, FormlyGroup, FormlyValidationMessage],
-        imports: [CommonModule],
-    }),
-    __param(1, Optional()), __param(1, Inject(FORMLY_CONFIG)),
-    __metadata("design:paramtypes", [FormlyConfig, Array])
-], FormlyModule);
 
-/*
- * Public API Surface of core
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 /**
- * Generated bundle index. Do not edit.
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { FORMLY_CONFIG, FieldArrayType, FieldType, FieldWrapper, FormlyConfig, FormlyField, FormlyForm, FormlyFormBuilder, FormlyModule, FormlyAttributes as ɵFormlyAttributes, FormlyGroup as ɵFormlyGroup, FormlyValidationMessage as ɵFormlyValidationMessage, defaultFormlyConfig as ɵa, FormlyTemplateType as ɵb, CoreExtension as ɵc, FieldValidationExtension as ɵd, defineHiddenProp as ɵdefineHiddenProp, FieldFormExtension as ɵe, FieldExpressionExtension as ɵf, getFieldInitialValue as ɵgetFieldInitialValue, observe as ɵobserve, reverseDeepMerge as ɵreverseDeepMerge };
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+
+export { FormlyForm, FormlyField, FormlyAttributes, FORMLY_CONFIG, FormlyConfig, FormlyFormBuilder, FieldType, Field, FieldArrayType, FieldWrapper, FormlyModule, defineHiddenProp as ɵdefineHiddenProp, reverseDeepMerge as ɵreverseDeepMerge, getFieldInitialValue as ɵgetFieldInitialValue, wrapProperty as ɵwrapProperty, defaultFormlyConfig as ɵa, CoreExtension as ɵe, FieldExpressionExtension as ɵh, FieldFormExtension as ɵg, FieldValidationExtension as ɵf, FormlyTemplateType as ɵd, FormlyGroup as ɵb, FormlyValidationMessage as ɵc };
+
 //# sourceMappingURL=ngx-formly-core.js.map

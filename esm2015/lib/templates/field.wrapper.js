@@ -1,14 +1,20 @@
-import { __decorate, __metadata } from "tslib";
-import { ViewContainerRef, ViewChild, Directive } from '@angular/core';
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+import { ViewContainerRef, ViewChild } from '@angular/core';
 import { FieldType } from './field.type';
-let FieldWrapper = class FieldWrapper extends FieldType {
+/**
+ * @abstract
+ * @template F
+ */
+export class FieldWrapper extends FieldType {
+}
+FieldWrapper.propDecorators = {
+    fieldComponent: [{ type: ViewChild, args: ['fieldComponent', (/** @type {?} */ ({ read: ViewContainerRef, static: false })),] }]
 };
-__decorate([
-    ViewChild('fieldComponent', { read: ViewContainerRef }),
-    __metadata("design:type", ViewContainerRef)
-], FieldWrapper.prototype, "fieldComponent", void 0);
-FieldWrapper = __decorate([
-    Directive()
-], FieldWrapper);
-export { FieldWrapper };
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZmllbGQud3JhcHBlci5qcyIsInNvdXJjZVJvb3QiOiJuZzovL0BuZ3gtZm9ybWx5L2NvcmUvIiwic291cmNlcyI6WyJsaWIvdGVtcGxhdGVzL2ZpZWxkLndyYXBwZXIudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IjtBQUFBLE9BQU8sRUFBRSxnQkFBZ0IsRUFBRSxTQUFTLEVBQUUsU0FBUyxFQUFFLE1BQU0sZUFBZSxDQUFDO0FBQ3ZFLE9BQU8sRUFBRSxTQUFTLEVBQUUsTUFBTSxjQUFjLENBQUM7QUFJekMsSUFBc0IsWUFBWSxHQUFsQyxNQUFzQixZQUE4RCxTQUFRLFNBQVk7Q0FFdkcsQ0FBQTtBQUQwRDtJQUF4RCxTQUFTLENBQUMsZ0JBQWdCLEVBQUUsRUFBRSxJQUFJLEVBQUUsZ0JBQWdCLEVBQUUsQ0FBQzs4QkFBaUIsZ0JBQWdCO29EQUFDO0FBRHRFLFlBQVk7SUFEakMsU0FBUyxFQUFFO0dBQ1UsWUFBWSxDQUVqQztTQUZxQixZQUFZIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgVmlld0NvbnRhaW5lclJlZiwgVmlld0NoaWxkLCBEaXJlY3RpdmUgfSBmcm9tICdAYW5ndWxhci9jb3JlJztcbmltcG9ydCB7IEZpZWxkVHlwZSB9IGZyb20gJy4vZmllbGQudHlwZSc7XG5pbXBvcnQgeyBGb3JtbHlGaWVsZENvbmZpZyB9IGZyb20gJy4uL21vZGVscyc7XG5cbkBEaXJlY3RpdmUoKVxuZXhwb3J0IGFic3RyYWN0IGNsYXNzIEZpZWxkV3JhcHBlcjxGIGV4dGVuZHMgRm9ybWx5RmllbGRDb25maWcgPSBGb3JtbHlGaWVsZENvbmZpZz4gZXh0ZW5kcyBGaWVsZFR5cGU8Rj4ge1xuICBAVmlld0NoaWxkKCdmaWVsZENvbXBvbmVudCcsIHsgcmVhZDogVmlld0NvbnRhaW5lclJlZiB9KSBmaWVsZENvbXBvbmVudDogVmlld0NvbnRhaW5lclJlZjtcbn1cbiJdfQ==
+if (false) {
+    /** @type {?} */
+    FieldWrapper.prototype.fieldComponent;
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZmllbGQud3JhcHBlci5qcyIsInNvdXJjZVJvb3QiOiJuZzovL0BuZ3gtZm9ybWx5L2NvcmUvIiwic291cmNlcyI6WyJsaWIvdGVtcGxhdGVzL2ZpZWxkLndyYXBwZXIudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7OztBQUFBLE9BQU8sRUFBRSxnQkFBZ0IsRUFBRSxTQUFTLEVBQUUsTUFBTSxlQUFlLENBQUM7QUFDNUQsT0FBTyxFQUFFLFNBQVMsRUFBRSxNQUFNLGNBQWMsQ0FBQzs7Ozs7QUFHekMsTUFBTSxPQUFnQixZQUE4RCxTQUFRLFNBQVk7Ozs2QkFFckcsU0FBUyxTQUFDLGdCQUFnQixFQUFFLG1CQUFLLEVBQUUsSUFBSSxFQUFFLGdCQUFnQixFQUFFLE1BQU0sRUFBRSxLQUFLLEVBQUUsRUFBQTs7OztJQUEzRSxzQ0FBOEciLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBWaWV3Q29udGFpbmVyUmVmLCBWaWV3Q2hpbGQgfSBmcm9tICdAYW5ndWxhci9jb3JlJztcbmltcG9ydCB7IEZpZWxkVHlwZSB9IGZyb20gJy4vZmllbGQudHlwZSc7XG5pbXBvcnQgeyBGb3JtbHlGaWVsZENvbmZpZyB9IGZyb20gJy4uL2NvbXBvbmVudHMvZm9ybWx5LmZpZWxkLmNvbmZpZyc7XG5cbmV4cG9ydCBhYnN0cmFjdCBjbGFzcyBGaWVsZFdyYXBwZXI8RiBleHRlbmRzIEZvcm1seUZpZWxkQ29uZmlnID0gRm9ybWx5RmllbGRDb25maWc+IGV4dGVuZHMgRmllbGRUeXBlPEY+IHtcbiAgLy8gVE9ETzogcmVtb3ZlIGBhbnlgLCBvbmNlIGRyb3BwaW5nIGFuZ3VsYXIgYFY3YCBzdXBwb3J0LlxuICBAVmlld0NoaWxkKCdmaWVsZENvbXBvbmVudCcsIDxhbnk+eyByZWFkOiBWaWV3Q29udGFpbmVyUmVmLCBzdGF0aWM6IGZhbHNlIH0pIGZpZWxkQ29tcG9uZW50OiBWaWV3Q29udGFpbmVyUmVmO1xufVxuIl19

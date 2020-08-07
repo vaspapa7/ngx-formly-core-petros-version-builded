@@ -1,9 +1,9 @@
-import { FormlyConfig } from '../../services/formly.config';
-import { FormlyExtension, FormlyFieldConfigCache } from '../../models';
+import { FormlyExtension, FormlyConfig } from '../../services/formly.config';
+import { FormlyFieldConfigCache } from '../../components/formly.field.config';
 /** @experimental */
 export declare class FieldValidationExtension implements FormlyExtension {
-    private config;
-    constructor(config: FormlyConfig);
+    private formlyConfig;
+    constructor(formlyConfig: FormlyConfig);
     onPopulate(field: FormlyFieldConfigCache): void;
     private initFieldValidation;
     private getPredefinedFieldValidation;

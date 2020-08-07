@@ -1,14 +1,14 @@
 import { FormlyFieldConfig } from './core';
-import { FormlyFieldConfigCache } from './models';
+import { FormlyFieldConfigCache } from './components/formly.field.config';
 export declare function getFieldId(formId: string, field: FormlyFieldConfig, index: string | number): string;
 export declare function getKeyPath(field: FormlyFieldConfigCache): string[];
 export declare const FORMLY_VALIDATORS: string[];
-export declare function assignFieldValue(field: FormlyFieldConfigCache, value: any, autoClear?: boolean): void;
+export declare function assignFieldValue(field: FormlyFieldConfigCache, value: any): void;
 export declare function assignModelValue(model: any, paths: string[], value: any): void;
 export declare function getFieldInitialValue(field: FormlyFieldConfig): any;
 export declare function getFieldValue(field: FormlyFieldConfig): any;
 export declare function reverseDeepMerge(dest: any, ...args: any[]): any;
-export declare function isNil(value: any): boolean;
+export declare function isNullOrUndefined(value: any): boolean;
 export declare function isUndefined(value: any): boolean;
 export declare function isBlankString(value: any): boolean;
 export declare function isFunction(value: any): boolean;
@@ -17,30 +17,13 @@ export declare function isObject(x: any): boolean;
 export declare function isPromise(obj: any): obj is Promise<any>;
 export declare function clone(value: any): any;
 export declare function defineHiddenProp(field: any, prop: string, defaultValue: any): void;
-declare type IObserveFn<T> = (change: {
+export declare function wrapProperty<T = any>(o: any, prop: string, setFn: (change: {
     currentValue: T;
     previousValue?: T;
     firstChange: boolean;
-}) => void;
-export interface IObserver<T> {
-    setValue: (value: T) => void;
-    unsubscribe: Function;
-}
-interface IObserveTarget<T> {
-    [prop: string]: any;
-    _observers?: {
-        [prop: string]: {
-            value: T;
-            onChange: IObserveFn<T>[];
-        };
-    };
-}
-export declare function observeDeep({ source, paths, target, setFn }: {
-    source: any;
-    paths: any;
-    target: any;
-    setFn: any;
-}): () => void;
-export declare function observe<T = any>(o: IObserveTarget<T>, paths: string[], setFn: IObserveFn<T>): IObserver<T>;
+}) => void): () => ((change: {
+    currentValue: T;
+    previousValue?: T;
+    firstChange: boolean;
+}) => void)[];
 export declare function reduceFormUpdateValidityCalls(form: any, action: Function): void;
-export {};

@@ -184,6 +184,12 @@ export interface FormlyHookConfig {
     afterContentInit?: FormlyHookFn;
     afterViewInit?: FormlyHookFn;
     onDestroy?: FormlyHookFn;
+    /** @deprecated */
+    doCheck?: FormlyHookFn;
+    /** @deprecated */
+    afterContentChecked?: FormlyHookFn;
+    /** @deprecated */
+    afterViewChecked?: FormlyHookFn;
 }
 export interface FormlyFormOptions {
     updateInitialValue?: () => void;

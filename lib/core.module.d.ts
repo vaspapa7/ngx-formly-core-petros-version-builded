@@ -1,7 +1,6 @@
 import { ModuleWithProviders } from '@angular/core';
-import { FormlyConfig } from './services/formly.config';
-import { ConfigOption } from './models';
-export declare function defaultFormlyConfig(config: FormlyConfig): ConfigOption;
+import { FormlyConfig, ConfigOption } from './services/formly.config';
+export declare function defaultFormlyConfig(formlyConfig: FormlyConfig): ConfigOption;
 export declare class FormlyModule {
     static forRoot(config?: ConfigOption): ModuleWithProviders<FormlyModule>;
     static forChild(config?: ConfigOption): ModuleWithProviders<FormlyModule>;

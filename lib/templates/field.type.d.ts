@@ -1,14 +1,21 @@
-import { FormlyFieldConfig } from '../models';
+import { FormGroup } from '@angular/forms';
+import { FormlyFieldConfig } from '../components/formly.field.config';
 export declare abstract class FieldType<F extends FormlyFieldConfig = FormlyFieldConfig> {
     field: F;
     defaultOptions?: F;
-    get model(): any;
-    get form(): import("@angular/forms").FormGroup | import("@angular/forms").FormArray;
-    get options(): import("../models").FormlyFormOptions;
-    get key(): string;
-    get formControl(): import("@angular/forms").AbstractControl;
-    get to(): import("../models").FormlyTemplateOptions;
-    get showError(): boolean;
-    get id(): string;
-    get formState(): any;
+    model: any;
+    form: FormGroup;
+    options: F['options'];
+    readonly key: string | number | string[];
+    readonly formControl: import("@angular/forms").AbstractControl;
+    readonly to: import("../components/formly.field.config").FormlyTemplateOptions;
+    readonly showError: boolean;
+    readonly id: string;
+    readonly formState: any;
+}
+/**
+ * @deprecated use `FieldType` instead
+ */
+export declare abstract class Field extends FieldType {
+    constructor();
 }

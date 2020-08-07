@@ -1,13 +1,15 @@
-import { __decorate } from "tslib";
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 import { NgModule } from '@angular/core';
 import { FormlySelectOptionsPipe } from './select-options.pipe';
-let FormlySelectModule = class FormlySelectModule {
-};
-FormlySelectModule = __decorate([
-    NgModule({
-        declarations: [FormlySelectOptionsPipe],
-        exports: [FormlySelectOptionsPipe],
-    })
-], FormlySelectModule);
-export { FormlySelectModule };
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic2VsZWN0Lm1vZHVsZS5qcyIsInNvdXJjZVJvb3QiOiJuZzovL0BuZ3gtZm9ybWx5L2NvcmUvc2VsZWN0LyIsInNvdXJjZXMiOlsic2VsZWN0Lm1vZHVsZS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiO0FBQUEsT0FBTyxFQUFFLFFBQVEsRUFBRSxNQUFNLGVBQWUsQ0FBQztBQUN6QyxPQUFPLEVBQUUsdUJBQXVCLEVBQUUsTUFBTSx1QkFBdUIsQ0FBQztBQU1oRSxJQUFhLGtCQUFrQixHQUEvQixNQUFhLGtCQUFrQjtDQUFHLENBQUE7QUFBckIsa0JBQWtCO0lBSjlCLFFBQVEsQ0FBQztRQUNSLFlBQVksRUFBRSxDQUFDLHVCQUF1QixDQUFDO1FBQ3ZDLE9BQU8sRUFBRSxDQUFDLHVCQUF1QixDQUFDO0tBQ25DLENBQUM7R0FDVyxrQkFBa0IsQ0FBRztTQUFyQixrQkFBa0IiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBOZ01vZHVsZSB9IGZyb20gJ0Bhbmd1bGFyL2NvcmUnO1xuaW1wb3J0IHsgRm9ybWx5U2VsZWN0T3B0aW9uc1BpcGUgfSBmcm9tICcuL3NlbGVjdC1vcHRpb25zLnBpcGUnO1xuXG5ATmdNb2R1bGUoe1xuICBkZWNsYXJhdGlvbnM6IFtGb3JtbHlTZWxlY3RPcHRpb25zUGlwZV0sXG4gIGV4cG9ydHM6IFtGb3JtbHlTZWxlY3RPcHRpb25zUGlwZV0sXG59KVxuZXhwb3J0IGNsYXNzIEZvcm1seVNlbGVjdE1vZHVsZSB7fVxuIl19
+export class FormlySelectModule {
+}
+FormlySelectModule.decorators = [
+    { type: NgModule, args: [{
+                declarations: [FormlySelectOptionsPipe],
+                exports: [FormlySelectOptionsPipe],
+            },] }
+];
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic2VsZWN0Lm1vZHVsZS5qcyIsInNvdXJjZVJvb3QiOiJuZzovL0BuZ3gtZm9ybWx5L2NvcmUvc2VsZWN0LyIsInNvdXJjZXMiOlsic2VsZWN0Lm1vZHVsZS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7O0FBQUEsT0FBTyxFQUFFLFFBQVEsRUFBRSxNQUFNLGVBQWUsQ0FBQztBQUN6QyxPQUFPLEVBQUUsdUJBQXVCLEVBQUUsTUFBTSx1QkFBdUIsQ0FBQztBQU1oRSxNQUFNLE9BQU8sa0JBQWtCOzs7WUFKOUIsUUFBUSxTQUFDO2dCQUNSLFlBQVksRUFBRSxDQUFDLHVCQUF1QixDQUFDO2dCQUN2QyxPQUFPLEVBQUUsQ0FBQyx1QkFBdUIsQ0FBQzthQUNuQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IE5nTW9kdWxlIH0gZnJvbSAnQGFuZ3VsYXIvY29yZSc7XG5pbXBvcnQgeyBGb3JtbHlTZWxlY3RPcHRpb25zUGlwZSB9IGZyb20gJy4vc2VsZWN0LW9wdGlvbnMucGlwZSc7XG5cbkBOZ01vZHVsZSh7XG4gIGRlY2xhcmF0aW9uczogW0Zvcm1seVNlbGVjdE9wdGlvbnNQaXBlXSxcbiAgZXhwb3J0czogW0Zvcm1seVNlbGVjdE9wdGlvbnNQaXBlXSxcbn0pXG5leHBvcnQgY2xhc3MgRm9ybWx5U2VsZWN0TW9kdWxlIHsgfVxuIl19

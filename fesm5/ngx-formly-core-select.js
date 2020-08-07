@@ -1,93 +1,228 @@
-import { __decorate } from 'tslib';
 import { Pipe, NgModule } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 var FormlySelectOptionsPipe = /** @class */ (function () {
     function FormlySelectOptionsPipe() {
     }
-    FormlySelectOptionsPipe.prototype.transform = function (options, field) {
+    /**
+     * @param {?} options
+     * @param {?=} field
+     * @return {?}
+     */
+    FormlySelectOptionsPipe.prototype.transform = /**
+     * @param {?} options
+     * @param {?=} field
+     * @return {?}
+     */
+    function (options, field) {
         var _this = this;
         if (!(options instanceof Observable)) {
             options = of(options);
         }
-        return options.pipe(map(function (value) { return _this.transformOptions(value, field); }));
+        return ((/** @type {?} */ (options))).pipe(map((/**
+         * @param {?} value
+         * @return {?}
+         */
+        function (value) { return _this.toOptions(value, field || {}); })));
     };
-    FormlySelectOptionsPipe.prototype.transformOptions = function (options, field) {
+    /**
+     * @private
+     * @param {?} options
+     * @param {?} field
+     * @return {?}
+     */
+    FormlySelectOptionsPipe.prototype.toOptions = /**
+     * @private
+     * @param {?} options
+     * @param {?} field
+     * @return {?}
+     */
+    function (options, field) {
         var _this = this;
-        var to = this.transformSelectProps(field);
-        var opts = [];
+        /** @type {?} */
+        var gOptions = [];
+        /** @type {?} */
         var groups = {};
-        options.forEach(function (option) {
-            var o = _this.transformOption(option, to);
-            if (o.group) {
-                var id_1 = groups[o.label];
-                if (id_1 === undefined) {
-                    groups[o.label] = opts.push(o) - 1;
-                }
-                else {
-                    o.group.forEach(function (o) { return opts[id_1].group.push(o); });
-                }
+        /** @type {?} */
+        var to = field.templateOptions || {};
+        to._flatOptions = true;
+        options.map((/**
+         * @param {?} option
+         * @return {?}
+         */
+        function (option) {
+            if (!_this.getGroupProp(option, to)) {
+                gOptions.push(_this.toOption(option, to));
             }
             else {
-                opts.push(o);
+                to._flatOptions = false;
+                if (!groups[_this.getGroupProp(option, to)]) {
+                    groups[_this.getGroupProp(option, to)] = [];
+                    gOptions.push({
+                        label: _this.getGroupProp(option, to),
+                        group: groups[_this.getGroupProp(option, to)],
+                    });
+                }
+                groups[_this.getGroupProp(option, to)].push(_this.toOption(option, to));
             }
-        });
-        if (field && field.templateOptions) {
-            field.templateOptions._flatOptions = !Object.keys(groups).length;
-        }
-        return opts;
+        }));
+        return gOptions;
     };
-    FormlySelectOptionsPipe.prototype.transformOption = function (option, to) {
-        var _this = this;
-        var group = to.groupProp(option);
-        if (Array.isArray(group)) {
-            return {
-                label: to.labelProp(option),
-                group: group.map(function (opt) { return _this.transformOption(opt, to); }),
-            };
-        }
-        option = {
-            label: to.labelProp(option),
-            value: to.valueProp(option),
-            disabled: !!to.disabledProp(option),
-        };
-        if (group) {
-            return { label: group, group: [option] };
-        }
-        return option;
-    };
-    FormlySelectOptionsPipe.prototype.transformSelectProps = function (field) {
-        var to = field && field.templateOptions ? field.templateOptions : {};
-        var selectPropFn = function (prop) { return (typeof prop === 'function' ? prop : function (o) { return o[prop]; }); };
+    /**
+     * @private
+     * @param {?} item
+     * @param {?} to
+     * @return {?}
+     */
+    FormlySelectOptionsPipe.prototype.toOption = /**
+     * @private
+     * @param {?} item
+     * @param {?} to
+     * @return {?}
+     */
+    function (item, to) {
         return {
-            groupProp: selectPropFn(to.groupProp || 'group'),
-            labelProp: selectPropFn(to.labelProp || 'label'),
-            valueProp: selectPropFn(to.valueProp || 'value'),
-            disabledProp: selectPropFn(to.disabledProp || 'disabled'),
+            label: this.getLabelProp(item, to),
+            value: this.getValueProp(item, to),
+            disabled: this.getDisabledProp(item, to) || false,
         };
     };
-    FormlySelectOptionsPipe = __decorate([
-        Pipe({ name: 'formlySelectOptions' })
-    ], FormlySelectOptionsPipe);
+    /**
+     * @private
+     * @param {?} item
+     * @param {?} to
+     * @return {?}
+     */
+    FormlySelectOptionsPipe.prototype.getLabelProp = /**
+     * @private
+     * @param {?} item
+     * @param {?} to
+     * @return {?}
+     */
+    function (item, to) {
+        if (typeof to.labelProp === 'function') {
+            return to.labelProp(item);
+        }
+        if (this.shouldUseLegacyOption(item, to)) {
+            console.warn("NgxFormly: legacy select option '{key, value}' is deprecated since v5.5, use '{value, label}' instead.");
+            return item.value;
+        }
+        return item[to.labelProp || 'label'];
+    };
+    /**
+     * @private
+     * @param {?} item
+     * @param {?} to
+     * @return {?}
+     */
+    FormlySelectOptionsPipe.prototype.getValueProp = /**
+     * @private
+     * @param {?} item
+     * @param {?} to
+     * @return {?}
+     */
+    function (item, to) {
+        if (typeof to.valueProp === 'function') {
+            return to.valueProp(item);
+        }
+        if (this.shouldUseLegacyOption(item, to)) {
+            return item.key;
+        }
+        return item[to.valueProp || 'value'];
+    };
+    /**
+     * @private
+     * @param {?} item
+     * @param {?} to
+     * @return {?}
+     */
+    FormlySelectOptionsPipe.prototype.getDisabledProp = /**
+     * @private
+     * @param {?} item
+     * @param {?} to
+     * @return {?}
+     */
+    function (item, to) {
+        if (typeof to.disabledProp === 'function') {
+            return to.disabledProp(item);
+        }
+        return item[to.disabledProp || 'disabled'];
+    };
+    /**
+     * @private
+     * @param {?} item
+     * @param {?} to
+     * @return {?}
+     */
+    FormlySelectOptionsPipe.prototype.getGroupProp = /**
+     * @private
+     * @param {?} item
+     * @param {?} to
+     * @return {?}
+     */
+    function (item, to) {
+        if (typeof to.groupProp === 'function') {
+            return to.groupProp(item);
+        }
+        return item[to.groupProp || 'group'];
+    };
+    /**
+     * @private
+     * @param {?} item
+     * @param {?} to
+     * @return {?}
+     */
+    FormlySelectOptionsPipe.prototype.shouldUseLegacyOption = /**
+     * @private
+     * @param {?} item
+     * @param {?} to
+     * @return {?}
+     */
+    function (item, to) {
+        return !to.valueProp
+            && !to.labelProp
+            && item != null
+            && typeof item === 'object'
+            && 'key' in item
+            && 'value' in item;
+    };
+    FormlySelectOptionsPipe.decorators = [
+        { type: Pipe, args: [{ name: 'formlySelectOptions' },] }
+    ];
     return FormlySelectOptionsPipe;
 }());
 
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
 var FormlySelectModule = /** @class */ (function () {
     function FormlySelectModule() {
     }
-    FormlySelectModule = __decorate([
-        NgModule({
-            declarations: [FormlySelectOptionsPipe],
-            exports: [FormlySelectOptionsPipe],
-        })
-    ], FormlySelectModule);
+    FormlySelectModule.decorators = [
+        { type: NgModule, args: [{
+                    declarations: [FormlySelectOptionsPipe],
+                    exports: [FormlySelectOptionsPipe],
+                },] }
+    ];
     return FormlySelectModule;
 }());
 
 /**
- * Generated bundle index. Do not edit.
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { FormlySelectModule, FormlySelectOptionsPipe as ɵFormlySelectOptionsPipe };
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+
+export { FormlySelectModule, FormlySelectOptionsPipe as ɵa };
+
 //# sourceMappingURL=ngx-formly-core-select.js.map

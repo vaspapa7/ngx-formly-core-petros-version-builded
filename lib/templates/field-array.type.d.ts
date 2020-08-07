@@ -1,8 +1,12 @@
 import { FormArray } from '@angular/forms';
 import { FieldType } from './field.type';
-import { FormlyFieldConfig, FormlyExtension } from '../models';
+import { FormlyFormBuilder } from '../services/formly.form.builder';
+import { FormlyFieldConfig } from '../components/formly.field.config';
+import { FormlyExtension } from '../services/formly.config';
 export declare abstract class FieldArrayType<F extends FormlyFieldConfig = FormlyFieldConfig> extends FieldType<F> implements FormlyExtension {
     formControl: FormArray;
+    defaultOptions: any;
+    constructor(builder?: FormlyFormBuilder);
     onPopulate(field: FormlyFieldConfig): void;
     add(i?: number, initialModel?: any, { markAsDirty }?: {
         markAsDirty: boolean;
@@ -10,5 +14,4 @@ export declare abstract class FieldArrayType<F extends FormlyFieldConfig = Forml
     remove(i: number, { markAsDirty }?: {
         markAsDirty: boolean;
     }): void;
-    private _build;
 }

@@ -1,35 +1,73 @@
-import { __assign, __read, __rest, __spread, __decorate } from 'tslib';
-import { ɵɵdefineInjectable, Injectable } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { ɵgetFieldInitialValue, ɵreverseDeepMerge, ɵdefineHiddenProp } from '@ngx-formly/core';
+import { __assign, __read, __rest, __spread } from 'tslib';
+import { Injectable, defineInjectable } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
+import { ɵreverseDeepMerge, ɵgetFieldInitialValue } from '@ngx-formly/core';
 
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+/**
+ * @param {?} v
+ * @return {?}
+ */
 function isEmpty(v) {
-    return v === '' || v == null;
+    return v === '' || v === undefined || v === null;
 }
+/**
+ * @param {?} schema
+ * @return {?}
+ */
 function isConst(schema) {
     return schema.hasOwnProperty('const') || (schema.enum && schema.enum.length === 1);
 }
+/**
+ * @param {?} field
+ * @return {?}
+ */
 function totalMatchedFields(field) {
     if (field.key && !field.fieldGroup) {
         return ɵgetFieldInitialValue(field) !== undefined ? 1 : 0;
     }
-    return field.fieldGroup.reduce(function (s, f) { return totalMatchedFields(f) + s; }, 0);
-}
-function isFieldValid(field) {
-    if (field.key) {
-        return field.formControl.valid;
-    }
-    return field.fieldGroup.every(function (f) { return isFieldValid(f); });
+    return field.fieldGroup.reduce((/**
+     * @param {?} s
+     * @param {?} f
+     * @return {?}
+     */
+    function (s, f) { return totalMatchedFields(f) + s; }), 0);
 }
 var FormlyJsonschema = /** @class */ (function () {
     function FormlyJsonschema() {
     }
-    FormlyJsonschema.prototype.toFieldConfig = function (schema, options) {
+    /**
+     * @param {?} schema
+     * @param {?=} options
+     * @return {?}
+     */
+    FormlyJsonschema.prototype.toFieldConfig = /**
+     * @param {?} schema
+     * @param {?=} options
+     * @return {?}
+     */
+    function (schema, options) {
         return this._toFieldConfig(schema, __assign({ schema: schema }, (options || {})));
     };
-    FormlyJsonschema.prototype._toFieldConfig = function (schema, options) {
+    /**
+     * @private
+     * @param {?} schema
+     * @param {?} options
+     * @return {?}
+     */
+    FormlyJsonschema.prototype._toFieldConfig = /**
+     * @private
+     * @param {?} schema
+     * @param {?} options
+     * @return {?}
+     */
+    function (schema, options) {
         var _this_1 = this;
         schema = this.resolveSchema(schema, options);
+        /** @type {?} */
         var field = {
             type: this.guessType(schema),
             defaultValue: schema.default,
@@ -44,15 +82,23 @@ var FormlyJsonschema = /** @class */ (function () {
         }
         switch (field.type) {
             case 'null': {
-                this.addValidator(field, 'null', function (_a) {
+                this.addValidator(field, 'null', (/**
+                 * @param {?} __0
+                 * @return {?}
+                 */
+                function (_a) {
                     var value = _a.value;
                     return value === null;
-                });
+                }));
                 break;
             }
             case 'number':
             case 'integer': {
-                field.parsers = [function (v) { return (isEmpty(v) ? null : Number(v)); }];
+                field.parsers = [(/**
+                     * @param {?} v
+                     * @return {?}
+                     */
+                    function (v) { return isEmpty(v) ? null : Number(v); })];
                 if (schema.hasOwnProperty('minimum')) {
                     field.templateOptions.min = schema.minimum;
                 }
@@ -61,44 +107,70 @@ var FormlyJsonschema = /** @class */ (function () {
                 }
                 if (schema.hasOwnProperty('exclusiveMinimum')) {
                     field.templateOptions.exclusiveMinimum = schema.exclusiveMinimum;
-                    this.addValidator(field, 'exclusiveMinimum', function (_a) {
+                    this.addValidator(field, 'exclusiveMinimum', (/**
+                     * @param {?} __0
+                     * @return {?}
+                     */
+                    function (_a) {
                         var value = _a.value;
-                        return isEmpty(value) || value > schema.exclusiveMinimum;
-                    });
+                        return isEmpty(value) || (value > schema.exclusiveMinimum);
+                    }));
                 }
                 if (schema.hasOwnProperty('exclusiveMaximum')) {
                     field.templateOptions.exclusiveMaximum = schema.exclusiveMaximum;
-                    this.addValidator(field, 'exclusiveMaximum', function (_a) {
+                    this.addValidator(field, 'exclusiveMaximum', (/**
+                     * @param {?} __0
+                     * @return {?}
+                     */
+                    function (_a) {
                         var value = _a.value;
-                        return isEmpty(value) || value < schema.exclusiveMaximum;
-                    });
+                        return isEmpty(value) || (value < schema.exclusiveMaximum);
+                    }));
                 }
                 if (schema.hasOwnProperty('multipleOf')) {
                     field.templateOptions.step = schema.multipleOf;
-                    this.addValidator(field, 'multipleOf', function (_a) {
+                    this.addValidator(field, 'multipleOf', (/**
+                     * @param {?} __0
+                     * @return {?}
+                     */
+                    function (_a) {
                         var value = _a.value;
-                        return isEmpty(value) || (Math.floor(value * 1000) % Math.floor(schema.multipleOf * 1000)) === 0;
-                    });
+                        return isEmpty(value) || (value % schema.multipleOf === 0);
+                    }));
                 }
                 break;
             }
             case 'string': {
-                var schemaType = schema.type;
-                if (Array.isArray(schemaType) && schemaType.indexOf('null') !== -1) {
-                    field.parsers = [function (v) { return (isEmpty(v) ? null : v); }];
+                /** @type {?} */
+                var schemaType = (/** @type {?} */ (schema.type));
+                if (Array.isArray(schemaType) && (schemaType.indexOf('null') !== -1)) {
+                    field.parsers = [(/**
+                         * @param {?} v
+                         * @return {?}
+                         */
+                        function (v) { return isEmpty(v) ? null : v; })];
                 }
-                ['minLength', 'maxLength', 'pattern'].forEach(function (prop) {
+                ['minLength', 'maxLength', 'pattern'].forEach((/**
+                 * @param {?} prop
+                 * @return {?}
+                 */
+                function (prop) {
                     if (schema.hasOwnProperty(prop)) {
                         field.templateOptions[prop] = schema[prop];
                     }
-                });
+                }));
                 break;
             }
             case 'object': {
                 field.fieldGroup = [];
                 var _a = __read(this.resolveDependencies(schema), 2), propDeps_1 = _a[0], schemaDeps_1 = _a[1];
-                Object.keys(schema.properties || {}).forEach(function (key) {
-                    var f = _this_1._toFieldConfig(schema.properties[key], options);
+                Object.keys(schema.properties || {}).forEach((/**
+                 * @param {?} key
+                 * @return {?}
+                 */
+                function (key) {
+                    /** @type {?} */
+                    var f = _this_1._toFieldConfig((/** @type {?} */ (schema.properties[key])), options);
                     field.fieldGroup.push(f);
                     f.key = key;
                     if (Array.isArray(schema.required) && schema.required.indexOf(key) !== -1) {
@@ -106,77 +178,134 @@ var FormlyJsonschema = /** @class */ (function () {
                     }
                     if (f.templateOptions && !f.templateOptions.required && propDeps_1[key]) {
                         f.expressionProperties = {
-                            'templateOptions.required': function (m) { return m && propDeps_1[key].some(function (k) { return !isEmpty(m[k]); }); },
+                            'templateOptions.required': (/**
+                             * @param {?} m
+                             * @return {?}
+                             */
+                            function (m) { return m && propDeps_1[key].some((/**
+                             * @param {?} k
+                             * @return {?}
+                             */
+                            function (k) { return !isEmpty(m[k]); })); }),
                         };
                     }
                     if (schemaDeps_1[key]) {
-                        var getConstValue_1 = function (s) {
+                        /** @type {?} */
+                        var getConstValue_1 = (/**
+                         * @param {?} s
+                         * @return {?}
+                         */
+                        function (s) {
                             return s.hasOwnProperty('const') ? s.const : s.enum[0];
-                        };
+                        });
+                        /** @type {?} */
                         var oneOfSchema = schemaDeps_1[key].oneOf;
-                        if (oneOfSchema &&
-                            oneOfSchema.every(function (o) { return o.properties && o.properties[key] && isConst(o.properties[key]); })) {
-                            oneOfSchema.forEach(function (oneOfSchemaItem) {
+                        if (oneOfSchema
+                            && oneOfSchema.every((/**
+                             * @param {?} o
+                             * @return {?}
+                             */
+                            function (o) { return o.properties && o.properties[key] && isConst(o.properties[key]); }))) {
+                            oneOfSchema.forEach((/**
+                             * @param {?} oneOfSchemaItem
+                             * @return {?}
+                             */
+                            function (oneOfSchemaItem) {
                                 var _a = oneOfSchemaItem.properties, _b = key, constSchema = _a[_b], properties = __rest(_a, [typeof _b === "symbol" ? _b : _b + ""]);
-                                field.fieldGroup.push(__assign(__assign({}, _this_1._toFieldConfig(__assign(__assign({}, oneOfSchemaItem), { properties: properties }), __assign(__assign({}, options), { autoClear: true }))), { hideExpression: function (m) { return !m || getConstValue_1(constSchema) !== m[key]; } }));
-                            });
+                                field.fieldGroup.push(__assign({}, _this_1._toFieldConfig(__assign({}, oneOfSchemaItem, { properties: properties }), __assign({}, options, { autoClear: true })), { hideExpression: (/**
+                                     * @param {?} m
+                                     * @return {?}
+                                     */
+                                    function (m) { return !m || getConstValue_1(constSchema) !== m[key]; }) }));
+                            }));
                         }
                         else {
-                            field.fieldGroup.push(__assign(__assign({}, _this_1._toFieldConfig(schemaDeps_1[key], options)), { hideExpression: function (m) { return !m || isEmpty(m[key]); } }));
+                            field.fieldGroup.push(__assign({}, _this_1._toFieldConfig(schemaDeps_1[key], options), { hideExpression: (/**
+                                 * @param {?} m
+                                 * @return {?}
+                                 */
+                                function (m) { return !m || isEmpty(m[key]); }) }));
                         }
                     }
-                });
+                }));
                 if (schema.oneOf) {
-                    field.fieldGroup.push(this.resolveMultiSchema('oneOf', schema.oneOf, options));
+                    field.fieldGroup.push(this.resolveMultiSchema('oneOf', (/** @type {?} */ (schema.oneOf)), options));
                 }
                 if (schema.anyOf) {
-                    field.fieldGroup.push(this.resolveMultiSchema('anyOf', schema.anyOf, options));
+                    field.fieldGroup.push(this.resolveMultiSchema('anyOf', (/** @type {?} */ (schema.anyOf)), options));
                 }
                 break;
             }
             case 'array': {
                 if (schema.hasOwnProperty('minItems')) {
                     field.templateOptions.minItems = schema.minItems;
-                    this.addValidator(field, 'minItems', function (_a) {
+                    this.addValidator(field, 'minItems', (/**
+                     * @param {?} __0
+                     * @return {?}
+                     */
+                    function (_a) {
                         var value = _a.value;
-                        return isEmpty(value) || value.length >= schema.minItems;
-                    });
+                        return isEmpty(value) || (value.length >= schema.minItems);
+                    }));
                 }
                 if (schema.hasOwnProperty('maxItems')) {
                     field.templateOptions.maxItems = schema.maxItems;
-                    this.addValidator(field, 'maxItems', function (_a) {
+                    this.addValidator(field, 'maxItems', (/**
+                     * @param {?} __0
+                     * @return {?}
+                     */
+                    function (_a) {
                         var value = _a.value;
-                        return isEmpty(value) || value.length <= schema.maxItems;
-                    });
+                        return isEmpty(value) || (value.length <= schema.maxItems);
+                    }));
                 }
                 if (schema.hasOwnProperty('uniqueItems')) {
                     field.templateOptions.uniqueItems = schema.uniqueItems;
-                    this.addValidator(field, 'uniqueItems', function (_a) {
+                    this.addValidator(field, 'uniqueItems', (/**
+                     * @param {?} __0
+                     * @return {?}
+                     */
+                    function (_a) {
                         var value = _a.value;
                         if (isEmpty(value) || !schema.uniqueItems) {
                             return true;
                         }
-                        var uniqueItems = Array.from(new Set(value.map(function (v) { return JSON.stringify(v); })));
+                        /** @type {?} */
+                        var uniqueItems = Array.from(new Set(value.map((/**
+                         * @param {?} v
+                         * @return {?}
+                         */
+                        function (v) { return JSON.stringify(v); }))));
                         return uniqueItems.length === value.length;
-                    });
+                    }));
                 }
                 // resolve items schema needed for isEnum check
                 if (schema.items && !Array.isArray(schema.items)) {
-                    schema.items = this.resolveSchema(schema.items, options);
+                    schema.items = this.resolveSchema((/** @type {?} */ (schema.items)), options);
                 }
                 // TODO: remove isEnum check once adding an option to skip extension
                 if (!this.isEnum(schema)) {
+                    /** @type {?} */
                     var _this_2 = this;
                     Object.defineProperty(field, 'fieldArray', {
-                        get: function () {
+                        get: (/**
+                         * @return {?}
+                         */
+                        function () {
                             if (!Array.isArray(schema.items)) {
                                 // When items is a single schema, the additionalItems keyword is meaningless, and it should not be used.
-                                return _this_2._toFieldConfig(schema.items, options);
+                                return _this_2._toFieldConfig((/** @type {?} */ (schema.items)), options);
                             }
+                            /** @type {?} */
                             var length = this.fieldGroup ? this.fieldGroup.length : 0;
-                            var itemSchema = schema.items[length] ? schema.items[length] : schema.additionalItems;
-                            return itemSchema ? _this_2._toFieldConfig(itemSchema, options) : {};
-                        },
+                            /** @type {?} */
+                            var itemSchema = schema.items[length]
+                                ? schema.items[length]
+                                : schema.additionalItems;
+                            return itemSchema
+                                ? _this_2._toFieldConfig((/** @type {?} */ (itemSchema)), options)
+                                : {};
+                        }),
                         enumerable: true,
                         configurable: true,
                     });
@@ -186,10 +315,14 @@ var FormlyJsonschema = /** @class */ (function () {
         }
         if (schema.hasOwnProperty('const')) {
             field.templateOptions.const = schema.const;
-            this.addValidator(field, 'const', function (_a) {
+            this.addValidator(field, 'const', (/**
+             * @param {?} __0
+             * @return {?}
+             */
+            function (_a) {
                 var value = _a.value;
                 return value === schema.const;
-            });
+            }));
             if (!field.type) {
                 field.defaultValue = schema.const;
             }
@@ -207,7 +340,19 @@ var FormlyJsonschema = /** @class */ (function () {
         // further customize how fields are being mapped
         return options.map ? options.map(field, schema) : field;
     };
-    FormlyJsonschema.prototype.resolveSchema = function (schema, options) {
+    /**
+     * @private
+     * @param {?} schema
+     * @param {?} options
+     * @return {?}
+     */
+    FormlyJsonschema.prototype.resolveSchema = /**
+     * @private
+     * @param {?} schema
+     * @param {?} options
+     * @return {?}
+     */
+    function (schema, options) {
         if (schema.$ref) {
             schema = this.resolveDefinition(schema, options);
         }
@@ -216,13 +361,30 @@ var FormlyJsonschema = /** @class */ (function () {
         }
         return schema;
     };
-    FormlyJsonschema.prototype.resolveAllOf = function (_a, options) {
+    /**
+     * @private
+     * @param {?} __0
+     * @param {?} options
+     * @return {?}
+     */
+    FormlyJsonschema.prototype.resolveAllOf = /**
+     * @private
+     * @param {?} __0
+     * @param {?} options
+     * @return {?}
+     */
+    function (_a, options) {
         var _this_1 = this;
         var allOf = _a.allOf, baseSchema = __rest(_a, ["allOf"]);
         if (!allOf.length) {
             throw Error("allOf array can not be empty " + allOf + ".");
         }
-        return allOf.reduce(function (base, schema) {
+        return allOf.reduce((/**
+         * @param {?} base
+         * @param {?} schema
+         * @return {?}
+         */
+        function (base, schema) {
             schema = _this_1.resolveSchema(schema, options);
             if (base.required && schema.required) {
                 base.required = __spread(base.required, schema.required);
@@ -231,21 +393,45 @@ var FormlyJsonschema = /** @class */ (function () {
                 base.uniqueItems = schema.uniqueItems;
             }
             // resolve to min value
-            ['maxLength', 'maximum', 'exclusiveMaximum', 'maxItems', 'maxProperties'].forEach(function (prop) {
+            ['maxLength', 'maximum', 'exclusiveMaximum', 'maxItems', 'maxProperties']
+                .forEach((/**
+             * @param {?} prop
+             * @return {?}
+             */
+            function (prop) {
                 if (!isEmpty(base[prop]) && !isEmpty(schema[prop])) {
                     base[prop] = base[prop] < schema[prop] ? base[prop] : schema[prop];
                 }
-            });
+            }));
             // resolve to max value
-            ['minLength', 'minimum', 'exclusiveMinimum', 'minItems', 'minProperties'].forEach(function (prop) {
+            ['minLength', 'minimum', 'exclusiveMinimum', 'minItems', 'minProperties']
+                .forEach((/**
+             * @param {?} prop
+             * @return {?}
+             */
+            function (prop) {
                 if (!isEmpty(base[prop]) && !isEmpty(schema[prop])) {
                     base[prop] = base[prop] > schema[prop] ? base[prop] : schema[prop];
                 }
-            });
+            }));
             return ɵreverseDeepMerge(base, schema);
-        }, baseSchema);
+        }), baseSchema);
     };
-    FormlyJsonschema.prototype.resolveMultiSchema = function (mode, schemas, options) {
+    /**
+     * @private
+     * @param {?} mode
+     * @param {?} schemas
+     * @param {?} options
+     * @return {?}
+     */
+    FormlyJsonschema.prototype.resolveMultiSchema = /**
+     * @private
+     * @param {?} mode
+     * @param {?} schemas
+     * @param {?} options
+     * @return {?}
+     */
+    function (mode, schemas, options) {
         var _this_1 = this;
         return {
             type: 'multischema',
@@ -254,90 +440,187 @@ var FormlyJsonschema = /** @class */ (function () {
                     type: 'enum',
                     templateOptions: {
                         multiple: mode === 'anyOf',
-                        options: schemas.map(function (s, i) { return ({ label: s.title, value: i }); }),
+                        options: schemas
+                            .map((/**
+                         * @param {?} s
+                         * @param {?} i
+                         * @return {?}
+                         */
+                        function (s, i) { return ({ label: s.title, value: i }); })),
                     },
                 },
                 {
-                    fieldGroup: schemas.map(function (s, i) { return (__assign(__assign({}, _this_1._toFieldConfig(s, __assign(__assign({}, options), { autoClear: true }))), { hideExpression: function (m, fs, f) {
+                    fieldGroup: schemas.map((/**
+                     * @param {?} s
+                     * @param {?} i
+                     * @return {?}
+                     */
+                    function (s, i) { return (__assign({}, _this_1._toFieldConfig(s, __assign({}, options, { autoClear: true })), { hideExpression: (/**
+                         * @param {?} m
+                         * @param {?} fs
+                         * @param {?} f
+                         * @return {?}
+                         */
+                        function (m, fs, f) {
+                            /** @type {?} */
                             var selectField = f.parent.parent.fieldGroup[0];
                             if (!selectField.formControl) {
+                                /** @type {?} */
                                 var value = f.parent.fieldGroup
-                                    .map(function (f, i) { return [f, i]; })
-                                    .filter(function (_a) {
-                                    var _b = __read(_a, 1), f = _b[0];
-                                    return isFieldValid(f);
-                                })
-                                    .sort(function (_a, _b) {
+                                    .map((/**
+                                 * @param {?} f
+                                 * @param {?} i
+                                 * @return {?}
+                                 */
+                                function (f, i) { return (/** @type {?} */ ([f, i])); }))
+                                    .filter((/**
+                                 * @param {?} __0
+                                 * @return {?}
+                                 */
+                                function (_a) {
+                                    var _b = __read(_a, 2), f = _b[0], i = _b[1];
+                                    return _this_1.isFieldValid(f, schemas[i], options);
+                                }))
+                                    .sort((/**
+                                 * @param {?} __0
+                                 * @param {?} __1
+                                 * @return {?}
+                                 */
+                                function (_a, _b) {
                                     var _c = __read(_a, 1), f1 = _c[0];
                                     var _d = __read(_b, 1), f2 = _d[0];
+                                    /** @type {?} */
                                     var matchedFields1 = totalMatchedFields(f1);
+                                    /** @type {?} */
                                     var matchedFields2 = totalMatchedFields(f2);
                                     if (matchedFields1 === matchedFields2) {
                                         return 0;
                                     }
                                     return matchedFields2 > matchedFields1 ? 1 : -1;
-                                })
-                                    .map(function (_a) {
+                                }))
+                                    .map((/**
+                                 * @param {?} __0
+                                 * @return {?}
+                                 */
+                                function (_a) {
                                     var _b = __read(_a, 2), i = _b[1];
                                     return i;
-                                });
+                                }));
+                                /** @type {?} */
                                 var normalizedValue = [value.length === 0 ? 0 : value[0]];
+                                /** @type {?} */
                                 var formattedValue = mode === 'anyOf' ? normalizedValue : normalizedValue[0];
-                                ɵdefineHiddenProp(selectField, 'formControl', new FormControl(formattedValue));
+                                selectField.formControl = new FormControl(formattedValue);
                             }
+                            /** @type {?} */
                             var control = selectField.formControl;
-                            return Array.isArray(control.value) ? control.value.indexOf(i) === -1 : control.value !== i;
-                        } })); }),
+                            return Array.isArray(control.value)
+                                ? control.value.indexOf(i) === -1
+                                : control.value !== i;
+                        }) })); })),
                 },
             ],
         };
     };
-    FormlyJsonschema.prototype.resolveDefinition = function (schema, options) {
+    /**
+     * @private
+     * @param {?} schema
+     * @param {?} options
+     * @return {?}
+     */
+    FormlyJsonschema.prototype.resolveDefinition = /**
+     * @private
+     * @param {?} schema
+     * @param {?} options
+     * @return {?}
+     */
+    function (schema, options) {
         var _a = __read(schema.$ref.split('#/'), 2), uri = _a[0], pointer = _a[1];
         if (uri) {
             throw Error("Remote schemas for " + schema.$ref + " not supported yet.");
         }
-        var definition = !pointer
-            ? null
-            : pointer.split('/').reduce(function (def, path) { return (def && def.hasOwnProperty(path) ? def[path] : null); }, options.schema);
+        /** @type {?} */
+        var definition = !pointer ? null : pointer.split('/').reduce((/**
+         * @param {?} def
+         * @param {?} path
+         * @return {?}
+         */
+        function (def, path) { return def && def.hasOwnProperty(path) ? def[path] : null; }), options.schema);
         if (!definition) {
             throw Error("Cannot find a definition for " + schema.$ref + ".");
         }
         if (definition.$ref) {
             return this.resolveDefinition(definition, options);
         }
-        return __assign(__assign({}, definition), ['title', 'description', 'default'].reduce(function (annotation, p) {
+        return __assign({}, definition, ['title', 'description', 'default'].reduce((/**
+         * @param {?} annotation
+         * @param {?} p
+         * @return {?}
+         */
+        function (annotation, p) {
             if (schema.hasOwnProperty(p)) {
                 annotation[p] = schema[p];
             }
             return annotation;
-        }, {}));
+        }), {}));
     };
-    FormlyJsonschema.prototype.resolveDependencies = function (schema) {
+    /**
+     * @private
+     * @param {?} schema
+     * @return {?}
+     */
+    FormlyJsonschema.prototype.resolveDependencies = /**
+     * @private
+     * @param {?} schema
+     * @return {?}
+     */
+    function (schema) {
+        /** @type {?} */
         var deps = {};
+        /** @type {?} */
         var schemaDeps = {};
-        Object.keys(schema.dependencies || {}).forEach(function (prop) {
-            var dependency = schema.dependencies[prop];
+        Object.keys(schema.dependencies || {}).forEach((/**
+         * @param {?} prop
+         * @return {?}
+         */
+        function (prop) {
+            /** @type {?} */
+            var dependency = (/** @type {?} */ (schema.dependencies[prop]));
             if (Array.isArray(dependency)) {
                 // Property dependencies
-                dependency.forEach(function (dep) {
+                dependency.forEach((/**
+                 * @param {?} dep
+                 * @return {?}
+                 */
+                function (dep) {
                     if (!deps[dep]) {
                         deps[dep] = [prop];
                     }
                     else {
                         deps[dep].push(prop);
                     }
-                });
+                }));
             }
             else {
                 // schema dependencies
                 schemaDeps[prop] = dependency;
             }
-        });
+        }));
         return [deps, schemaDeps];
     };
-    FormlyJsonschema.prototype.guessType = function (schema) {
-        var type = schema.type;
+    /**
+     * @private
+     * @param {?} schema
+     * @return {?}
+     */
+    FormlyJsonschema.prototype.guessType = /**
+     * @private
+     * @param {?} schema
+     * @return {?}
+     */
+    function (schema) {
+        /** @type {?} */
+        var type = (/** @type {?} */ (schema.type));
         if (!type && schema.properties) {
             return 'object';
         }
@@ -351,42 +634,115 @@ var FormlyJsonschema = /** @class */ (function () {
         }
         return type;
     };
-    FormlyJsonschema.prototype.addValidator = function (field, name, validator) {
+    /**
+     * @private
+     * @param {?} field
+     * @param {?} name
+     * @param {?} validator
+     * @return {?}
+     */
+    FormlyJsonschema.prototype.addValidator = /**
+     * @private
+     * @param {?} field
+     * @param {?} name
+     * @param {?} validator
+     * @return {?}
+     */
+    function (field, name, validator) {
         field.validators = field.validators || {};
         field.validators[name] = validator;
     };
-    FormlyJsonschema.prototype.isEnum = function (schema) {
-        return (schema.enum ||
-            (schema.anyOf && schema.anyOf.every(isConst)) ||
-            (schema.oneOf && schema.oneOf.every(isConst)) ||
-            (schema.uniqueItems && schema.items && !Array.isArray(schema.items) && this.isEnum(schema.items)));
+    /**
+     * @private
+     * @param {?} schema
+     * @return {?}
+     */
+    FormlyJsonschema.prototype.isEnum = /**
+     * @private
+     * @param {?} schema
+     * @return {?}
+     */
+    function (schema) {
+        return schema.enum
+            || (schema.anyOf && schema.anyOf.every(isConst))
+            || (schema.oneOf && schema.oneOf.every(isConst))
+            || schema.uniqueItems && schema.items && !Array.isArray(schema.items) && this.isEnum((/** @type {?} */ (schema.items)));
     };
-    FormlyJsonschema.prototype.toEnumOptions = function (schema) {
+    /**
+     * @private
+     * @param {?} schema
+     * @return {?}
+     */
+    FormlyJsonschema.prototype.toEnumOptions = /**
+     * @private
+     * @param {?} schema
+     * @return {?}
+     */
+    function (schema) {
         if (schema.enum) {
-            return schema.enum.map(function (value) { return ({ value: value, label: value }); });
+            return schema.enum.map((/**
+             * @param {?} value
+             * @return {?}
+             */
+            function (value) { return ({ value: value, label: value }); }));
         }
-        var toEnum = function (s) {
+        /** @type {?} */
+        var toEnum = (/**
+         * @param {?} s
+         * @return {?}
+         */
+        function (s) {
+            /** @type {?} */
             var value = s.hasOwnProperty('const') ? s.const : s.enum[0];
             return { value: value, label: s.title || value };
-        };
+        });
         if (schema.anyOf) {
             return schema.anyOf.map(toEnum);
         }
         if (schema.oneOf) {
             return schema.oneOf.map(toEnum);
         }
-        return this.toEnumOptions(schema.items);
+        return this.toEnumOptions((/** @type {?} */ (schema.items)));
     };
-    FormlyJsonschema.ɵprov = ɵɵdefineInjectable({ factory: function FormlyJsonschema_Factory() { return new FormlyJsonschema(); }, token: FormlyJsonschema, providedIn: "root" });
-    FormlyJsonschema = __decorate([
-        Injectable({ providedIn: 'root' })
-    ], FormlyJsonschema);
+    /**
+     * @private
+     * @param {?} field
+     * @param {?} schema
+     * @param {?} options
+     * @return {?}
+     */
+    FormlyJsonschema.prototype.isFieldValid = /**
+     * @private
+     * @param {?} field
+     * @param {?} schema
+     * @param {?} options
+     * @return {?}
+     */
+    function (field, schema, options) {
+        var form = ((/** @type {?} */ (field.options)))._buildField({
+            form: new FormGroup({}),
+            fieldGroup: [this._toFieldConfig(schema, options)],
+            model: field.model,
+        }).form;
+        return form.valid;
+    };
+    FormlyJsonschema.decorators = [
+        { type: Injectable, args: [{ providedIn: 'root' },] }
+    ];
+    /** @nocollapse */ FormlyJsonschema.ngInjectableDef = defineInjectable({ factory: function FormlyJsonschema_Factory() { return new FormlyJsonschema(); }, token: FormlyJsonschema, providedIn: "root" });
     return FormlyJsonschema;
 }());
 
 /**
- * Generated bundle index. Do not edit.
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
 export { FormlyJsonschema };
+
 //# sourceMappingURL=ngx-formly-core-json-schema.js.map

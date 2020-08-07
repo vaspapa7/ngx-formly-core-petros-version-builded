@@ -20,4 +20,5 @@ export declare class FormlyJsonschema {
     private addValidator;
     private isEnum;
     private toEnumOptions;
+    private isFieldValid;
 }
