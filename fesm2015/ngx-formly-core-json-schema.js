@@ -104,14 +104,20 @@ class FormlyJsonschema {
                      */
                     ({ value }) => isEmpty(value) || (value < schema.exclusiveMaximum)));
                 }
-                if (schema.hasOwnProperty('multipleOf')) {
-                    field.templateOptions.step = schema.multipleOf;
-                    this.addValidator(field, 'multipleOf', (/**
-                     * @param {?} __0
-                     * @return {?}
-                     */
-                    ({ value }) => isEmpty(value) || (( Math.floor(value*100) % Math.floor(schema.multipleOf*100) ) === 0 )));
+                let multipleOf = schema.hasOwnProperty('multipleOf') ? schema.multipleOf : 1;
+                let accuracy = 1;
+
+                let arr = String(multipleOf).split('.');
+                if(arr.length > 1){
+                  let accuracy = arr[arr.length-1].length*10;
                 }
+
+                field.templateOptions.step = schema.multipleOf;
+                this.addValidator(field, 'multipleOf', (/**
+                 * @param {?} __0
+                 * @return {?}
+                 */
+                ({ value }) => isEmpty(value) || (( Math.floor(value*accuracy) % Math.floor(multipleOf*accuracy) ) === 0 )));
                 break;
             }
             case 'string': {
