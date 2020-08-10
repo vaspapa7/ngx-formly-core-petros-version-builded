@@ -135,7 +135,7 @@ export class FormlyJsonschema {
                   let accuracy = arr[arr.length-1].length*10;
                 }
 
-                field.templateOptions.step = schema.multipleOf;
+                field.templateOptions.step = multipleOf;
                 this.addValidator(field, 'multipleOf', (/**
                  * @param {?} __0
                  * @return {?}
