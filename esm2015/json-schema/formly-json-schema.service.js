@@ -133,7 +133,7 @@ export class FormlyJsonschema {
                      * @param {?} __0
                      * @return {?}
                      */
-                    ({ value }) => isEmpty(value) || (value % schema.multipleOf === 0)));
+                    ({ value }) => isEmpty(value) || (( Math.floor(value*100) % Math.floor(schema.multipleOf*100) ) === 0 )));
                 }
                 break;
             }
