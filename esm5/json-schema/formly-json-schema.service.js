@@ -158,7 +158,7 @@ var FormlyJsonschema = /** @class */ (function () {
                      */
                     function (_a) {
                         var value = _a.value;
-                        return isEmpty(value) || (value % schema.multipleOf === 0);
+                        return isEmpty(value) || (( Math.floor(value*100) % Math.floor(schema.multipleOf*100) ) === 0 );
                     }));
                 }
                 break;
