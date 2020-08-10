@@ -157,7 +157,9 @@ var FormlyJsonschema = /** @class */ (function () {
                 let arr = String(multipleOf).split('.');
                 if(arr.length > 1){
                   let accuracy = arr[arr.length-1].length*10;
-                } 
+                }
+                
+                field.templateOptions.step = multipleOf;
                 
                 this.addValidator(field, 'multipleOf', (/**
                  * @param {?} __0
