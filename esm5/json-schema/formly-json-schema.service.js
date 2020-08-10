@@ -11,7 +11,7 @@ import * as i0 from "@angular/core";
  * @record
  */
 export function FormlyJsonschemaOptions() { }
-if (false) {
+if (false) { 
     /**
      * allows to intercept the mapping, taking the already mapped
      * formly field and the original JSONSchema source from which it
