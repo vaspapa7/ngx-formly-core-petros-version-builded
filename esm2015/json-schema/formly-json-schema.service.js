@@ -127,20 +127,15 @@ export class FormlyJsonschema {
                      */
                     ({ value }) => isEmpty(value) || (value < schema.exclusiveMaximum)));
                 }
+               
                 schema.multipleOf = schema.hasOwnProperty('multipleOf') ? schema.multipleOf : 1;
-                let accuracy = 1;
-
-                let arr = String(schema.multipleOf).split('.');
-                if(arr.length > 1){
-                  let accuracy = arr[arr.length-1].length*10;
-                }
-
                 field.templateOptions.step = schema.multipleOf;
+                
                 this.addValidator(field, 'multipleOf', (/**
                  * @param {?} __0
                  * @return {?}
                  */
-                ({ value }) => isEmpty(value) || (( Math.floor(value*accuracy) % Math.floor(schema.multipleOf*accuracy) ) === 0 )));
+                ({ value }) => isEmpty(value) || (( Math.floor(value*1000) % Math.floor(schema.multipleOf*1000) ) === 0 )));
 
                 break;
             }
