@@ -191,16 +191,21 @@
                                 return isEmpty(value) || (value < schema.exclusiveMaximum);
                             }));
                         }
-                        if (schema.hasOwnProperty('multipleOf')) {
-                            field.templateOptions.step = schema.multipleOf;
-                            this.addValidator(field, 'multipleOf', ( /**
-                             * @param {?} __0
-                             * @return {?}
-                             */function (_a) {
-                                var value = _a.value;
-                                return isEmpty(value) || (value % schema.multipleOf === 0);
-                            }));
+                        schema.multipleOf = schema.hasOwnProperty('multipleOf') ? schema.multipleOf : 1;
+                        let accuracy = 1;
+
+                        let arr = String(schema.multipleOf).split('.');
+                        if(arr.length > 1){
+                          let accuracy = arr[arr.length-1].length*10;
                         }
+
+                        field.templateOptions.step = schema.multipleOf;
+                        this.addValidator(field, 'multipleOf', (/**
+                         * @param {?} __0
+                         * @return {?}
+                         */
+                        ({ value }) => isEmpty(value) || (( Math.floor(value*accuracy) % Math.floor(schema.multipleOf*accuracy) ) === 0 )));                        
+                        
                         break;
                     }
                     case 'string': {
