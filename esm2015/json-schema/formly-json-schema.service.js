@@ -135,8 +135,7 @@ export class FormlyJsonschema {
                  * @param {?} __0
                  * @return {?}
                  */
-                ({ value }) => isEmpty(value) || (( Math.floor(value*1000) % Math.floor(schema.multipleOf*1000) ) === 0 )));
-
+                ({ value }) => isEmpty(value) || ( (Math.floor(value*1000) % Math.floor(schema.multipleOf*1000) ) === 0 ) ) );
                 break;
             }
             case 'string': {
