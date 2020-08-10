@@ -151,15 +151,15 @@ var FormlyJsonschema = /** @class */ (function () {
                     }));
                 }
 
-                let multipleOf = schema.hasOwnProperty('multipleOf') ? schema.multipleOf : 1;
+                schema.multipleOf = schema.hasOwnProperty('multipleOf') ? schema.multipleOf : 1;
                 let accuracy = 1;
                 
-                let arr = String(multipleOf).split('.');
+                let arr = String(schema.multipleOf).split('.');
                 if(arr.length > 1){
                   let accuracy = arr[arr.length-1].length*10;
                 }
                 
-                field.templateOptions.step = multipleOf;
+                field.templateOptions.step = schema.multipleOf;
                 
                 this.addValidator(field, 'multipleOf', (/**
                  * @param {?} __0
@@ -167,7 +167,7 @@ var FormlyJsonschema = /** @class */ (function () {
                  */
                 function (_a) {
                     var value = _a.value;
-                    return isEmpty(value) || (( Math.floor(value*accuracy) % Math.floor(multipleOf*accuracy) ) === 0 );
+                    return isEmpty(value) || (( Math.floor(value*accuracy) % Math.floor(schema.multipleOf*accuracy) ) === 0 );
                 }));
                 break;
             }
